@@ -9,7 +9,9 @@
 
     <title>schannel - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../main.css">
+    
 
     
     
@@ -42,214 +44,27 @@
 
     <section id='main' class="content mod">
 <h1 class='fqn'><span class='in-band'>Crate <a class='mod' href=''>schannel</a></span><span class='out-of-band'><span id='render-detail'>
-            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
-                [<span class='inner'>&#x2212;</span>]
-            </a>
-        </span><a id='src-0' class='srclink' href='../src/schannel/lib.rs.html#1-831' title='goto source code'>[src]</a></span></h1>
-<div class='docblock'><p>Schannel is a pure-Rust wrapper to provide SSL functionality under windows by using schannel, which
-removes the requirement of openssl.</p>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-0' class='srclink' href='../src/schannel/src/lib.rs.html#1-39' title='goto source code'>[src]</a></span></h1>
+<div class='docblock'><p>Bindings to the Windows SChannel APIs.</p>
 </div><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
 <table>
-                    <tr class=' module-item'>
-                        <td><a class='mod' href='hyperimpl/index.html'
-                               title='schannel::hyperimpl'>hyperimpl</a></td>
-                        <td class='docblock short'>
-                             
-                        </td>
-                    </tr>
-                </table><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
-<table>
-                    <tr class=' module-item'>
-                        <td><a class='struct' href='struct.SslInfoClient.html'
-                               title='schannel::SslInfoClient'>SslInfoClient</a></td>
-                        <td class='docblock short'>
-                             <p>SSL client wrapper configuration</p>
-
-                        </td>
-                    </tr>
-                
-                    <tr class=' module-item'>
-                        <td><a class='struct' href='struct.SslInfoServer.html'
-                               title='schannel::SslInfoServer'>SslInfoServer</a></td>
-                        <td class='docblock short'>
-                             <p>SSL wrapper configuration, which only applies to SSL peers/servers</p>
-
-                        </td>
-                    </tr>
-                
-                    <tr class=' module-item'>
-                        <td><a class='struct' href='struct.SslStream.html'
-                               title='schannel::SslStream'>SslStream</a></td>
-                        <td class='docblock short'>
-                             <p>SSL wrapper for generic streams</p>
-
-                        </td>
-                    </tr>
-                </table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
-<table>
-                    <tr class=' module-item'>
-                        <td><a class='enum' href='enum.SslCertCondition.html'
-                               title='schannel::SslCertCondition'>SslCertCondition</a></td>
-                        <td class='docblock short'>
-                             <p>SSL certificate conditions</p>
-
-                        </td>
-                    </tr>
-                
-                    <tr class=' module-item'>
-                        <td><a class='enum' href='enum.SslCertStore.html'
-                               title='schannel::SslCertStore'>SslCertStore</a></td>
-                        <td class='docblock short'>
-                             
-                        </td>
-                    </tr>
-                
-                    <tr class=' module-item'>
-                        <td><a class='enum' href='enum.SslError.html'
-                               title='schannel::SslError'>SslError</a></td>
-                        <td class='docblock short'>
-                             <p>Possible errors which can occur when doing SSL operations (e.g. schannel failure)</p>
-
-                        </td>
-                    </tr>
-                
-                    <tr class=' module-item'>
-                        <td><a class='enum' href='enum.SslInfo.html'
-                               title='schannel::SslInfo'>SslInfo</a></td>
-                        <td class='docblock short'>
-                             
-                        </td>
-                    </tr>
-                
-                    <tr class=' module-item'>
-                        <td><a class='enum' href='enum.SslVersion.html'
-                               title='schannel::SslVersion'>SslVersion</a></td>
-                        <td class='docblock short'>
-                             
-                        </td>
-                    </tr>
-                </table><h2 id='constants' class='section-header'><a href="#constants">Constants</a></h2>
-<table>
-                    <tr class=' module-item'>
-                        <td><a class='constant' href='constant.CERT_COMPARE_NAME_STR_W.html'
-                               title='schannel::CERT_COMPARE_NAME_STR_W'>CERT_COMPARE_NAME_STR_W</a></td>
-                        <td class='docblock short'>
-                             
-                        </td>
-                    </tr>
-                
-                    <tr class=' module-item'>
-                        <td><a class='constant' href='constant.CERT_COMPARE_SHA1_HASH.html'
-                               title='schannel::CERT_COMPARE_SHA1_HASH'>CERT_COMPARE_SHA1_HASH</a></td>
-                        <td class='docblock short'>
-                             
-                        </td>
-                    </tr>
-                
-                    <tr class=' module-item'>
-                        <td><a class='constant' href='constant.CERT_COMPARE_SHIFT.html'
-                               title='schannel::CERT_COMPARE_SHIFT'>CERT_COMPARE_SHIFT</a></td>
-                        <td class='docblock short'>
-                             
-                        </td>
-                    </tr>
-                
-                    <tr class=' module-item'>
-                        <td><a class='constant' href='constant.CERT_FIND_SHA1_HASH.html'
-                               title='schannel::CERT_FIND_SHA1_HASH'>CERT_FIND_SHA1_HASH</a></td>
-                        <td class='docblock short'>
-                             
-                        </td>
-                    </tr>
-                
-                    <tr class=' module-item'>
-                        <td><a class='constant' href='constant.CERT_FIND_SUBJECT_STR.html'
-                               title='schannel::CERT_FIND_SUBJECT_STR'>CERT_FIND_SUBJECT_STR</a></td>
-                        <td class='docblock short'>
-                             
-                        </td>
-                    </tr>
-                
-                    <tr class=' module-item'>
-                        <td><a class='constant' href='constant.CERT_STORE_PROV_SYSTEM.html'
-                               title='schannel::CERT_STORE_PROV_SYSTEM'>CERT_STORE_PROV_SYSTEM</a></td>
-                        <td class='docblock short'>
-                             
-                        </td>
-                    </tr>
-                
-                    <tr class=' module-item'>
-                        <td><a class='constant' href='constant.CERT_STORE_PROV_SYSTEM_W.html'
-                               title='schannel::CERT_STORE_PROV_SYSTEM_W'>CERT_STORE_PROV_SYSTEM_W</a></td>
-                        <td class='docblock short'>
-                             
-                        </td>
-                    </tr>
-                
-                    <tr class=' module-item'>
-                        <td><a class='constant' href='constant.CERT_STORE_READONLY_FLAG.html'
-                               title='schannel::CERT_STORE_READONLY_FLAG'>CERT_STORE_READONLY_FLAG</a></td>
-                        <td class='docblock short'>
-                             
-                        </td>
-                    </tr>
-                
-                    <tr class=' module-item'>
-                        <td><a class='constant' href='constant.CERT_SYSTEM_STORE_CURRENT_USER.html'
-                               title='schannel::CERT_SYSTEM_STORE_CURRENT_USER'>CERT_SYSTEM_STORE_CURRENT_USER</a></td>
-                        <td class='docblock short'>
-                             
-                        </td>
-                    </tr>
-                
-                    <tr class=' module-item'>
-                        <td><a class='constant' href='constant.CERT_SYSTEM_STORE_CURRENT_USER_ID.html'
-                               title='schannel::CERT_SYSTEM_STORE_CURRENT_USER_ID'>CERT_SYSTEM_STORE_CURRENT_USER_ID</a></td>
-                        <td class='docblock short'>
-                             
-                        </td>
-                    </tr>
-                
-                    <tr class=' module-item'>
-                        <td><a class='constant' href='constant.CERT_SYSTEM_STORE_LOCAL_MACHINE.html'
-                               title='schannel::CERT_SYSTEM_STORE_LOCAL_MACHINE'>CERT_SYSTEM_STORE_LOCAL_MACHINE</a></td>
-                        <td class='docblock short'>
-                             
-                        </td>
-                    </tr>
-                
-                    <tr class=' module-item'>
-                        <td><a class='constant' href='constant.CERT_SYSTEM_STORE_LOCAL_MACHINE_ID.html'
-                               title='schannel::CERT_SYSTEM_STORE_LOCAL_MACHINE_ID'>CERT_SYSTEM_STORE_LOCAL_MACHINE_ID</a></td>
-                        <td class='docblock short'>
-                             
-                        </td>
-                    </tr>
-                
-                    <tr class=' module-item'>
-                        <td><a class='constant' href='constant.CERT_SYSTEM_STORE_LOCATION_SHIFT.html'
-                               title='schannel::CERT_SYSTEM_STORE_LOCATION_SHIFT'>CERT_SYSTEM_STORE_LOCATION_SHIFT</a></td>
-                        <td class='docblock short'>
-                             
-                        </td>
-                    </tr>
-                
-                    <tr class=' module-item'>
-                        <td><a class='constant' href='constant.CERT_SYSTEM_STORE_USERS.html'
-                               title='schannel::CERT_SYSTEM_STORE_USERS'>CERT_SYSTEM_STORE_USERS</a></td>
-                        <td class='docblock short'>
-                             
-                        </td>
-                    </tr>
-                
-                    <tr class=' module-item'>
-                        <td><a class='constant' href='constant.CERT_SYSTEM_STORE_USERS_ID.html'
-                               title='schannel::CERT_SYSTEM_STORE_USERS_ID'>CERT_SYSTEM_STORE_USERS_ID</a></td>
-                        <td class='docblock short'>
-                             
-                        </td>
-                    </tr>
-                </table></section>
+                       <tr class=' module-item'>
+                           <td><a class='mod' href='schannel_cred/index.html'
+                                  title='schannel::schannel_cred'>schannel_cred</a></td>
+                           <td class='docblock short'>
+                                <p>Schannel credentials.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='mod' href='tls_stream/index.html'
+                                  title='schannel::tls_stream'>tls_stream</a></td>
+                           <td class='docblock short'>
+                                <p>Schannel TLS streams.</p>
+                           </td>
+                       </tr></table></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>
@@ -272,6 +87,8 @@ removes the requirement of openssl.</p>
                     <dd>Move down in search results</dd>
                     <dt>&#9166;</dt>
                     <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
                 </dl>
             </div>
 
@@ -292,7 +109,7 @@ removes the requirement of openssl.</p>
 
                 <p>
                     Search functions by type signature (e.g.
-                    <code>vec -> usize</code>)
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
                 </p>
             </div>
         </div>
@@ -308,6 +125,6 @@ removes the requirement of openssl.</p>
     <script src="../jquery.js"></script>
     <script src="../main.js"></script>
     
-    <script async src="../search-index.js"></script>
+    <script defer src="../search-index.js"></script>
 </body>
 </html>

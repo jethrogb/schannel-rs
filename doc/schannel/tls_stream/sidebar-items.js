@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Builder","A builder type for `TlsStream`s."],["TlsStream","An Schannel TLS stream."]]});
