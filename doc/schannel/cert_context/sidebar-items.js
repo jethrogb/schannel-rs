@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["CertContext","Wrapper of a winapi certificate, or a `PCCERT_CONTEXT`."]]});

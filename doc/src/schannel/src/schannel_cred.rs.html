@@ -284,6 +284,24 @@
 <span id="240">240</span>
 <span id="241">241</span>
 <span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Schannel credentials.</span>
 <span class='kw'>use</span> <span class='ident'>winapi</span>;
@@ -293,6 +311,7 @@
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>ptr</span>;
 
 <span class='kw'>use</span> <span class='ident'>Inner</span>;
+<span class='kw'>use</span> <span class='ident'>cert_context</span>::<span class='ident'>CertContext</span>;
 
 <span class='macro'>lazy_static</span><span class='macro'>!</span> {
     <span class='kw'>static</span> <span class='kw-2'>ref</span> <span class='ident'>UNISP_NAME</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>winapi</span>::<span class='ident'>UNISP_NAME</span>.<span class='ident'>bytes</span>().<span class='ident'>chain</span>(<span class='prelude-val'>Some</span>(<span class='number'>0</span>)).<span class='ident'>collect</span>();
@@ -420,6 +439,7 @@
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Builder</span> {
     <span class='ident'>supported_algorithms</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Algorithm</span><span class='op'>&gt;&gt;</span>,
     <span class='ident'>enabled_protocols</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Protocol</span><span class='op'>&gt;&gt;</span>,
+    <span class='ident'>certs</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>CertContext</span><span class='op'>&gt;</span>,
 }
 
 <span class='kw'>impl</span> <span class='ident'>Builder</span> {
@@ -458,10 +478,24 @@
         <span class='self'>self</span>
     }
 
+    <span class='doccomment'>/// Add a certificate to get passed down when the credentials are acquired.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// Certificates passed here may specify a certificate that contains a</span>
+    <span class='doccomment'>/// private key to be used in authenticating the application. Typically,</span>
+    <span class='doccomment'>/// this is called once for each key exchange method supported by</span>
+    <span class='doccomment'>/// servers.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// Clients often do not call this function and either depend on Schannel to</span>
+    <span class='doccomment'>/// find an appropriate certificate or create a certificate later if needed.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>cert</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>cx</span>: <span class='ident'>CertContext</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span> {
+        <span class='self'>self</span>.<span class='ident'>certs</span>.<span class='ident'>push</span>(<span class='ident'>cx</span>);
+        <span class='self'>self</span>
+    }
+
     <span class='doccomment'>/// Creates a new `SchannelCred`.</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>acquire</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>direction</span>: <span class='ident'>Direction</span>) <span class='op'>-&gt;</span> <span class='ident'>io</span>::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>SchannelCred</span><span class='op'>&gt;</span> {
         <span class='kw'>unsafe</span> {
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>handle</span> <span class='op'>=</span> <span class='ident'>mem</span>::<span class='ident'>uninitialized</span>();
+            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>handle</span> <span class='op'>=</span> <span class='ident'>mem</span>::<span class='ident'>zeroed</span>();
             <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>cred_data</span>: <span class='ident'>winapi</span>::<span class='ident'>SCHANNEL_CRED</span> <span class='op'>=</span> <span class='ident'>mem</span>::<span class='ident'>zeroed</span>();
             <span class='ident'>cred_data</span>.<span class='ident'>dwVersion</span> <span class='op'>=</span> <span class='ident'>winapi</span>::<span class='ident'>SCHANNEL_CRED_VERSION</span>;
             <span class='ident'>cred_data</span>.<span class='ident'>dwFlags</span> <span class='op'>=</span> <span class='ident'>winapi</span>::<span class='ident'>SCH_USE_STRONG_CRYPTO</span>;
@@ -474,6 +508,8 @@
                     .<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>p</span><span class='op'>|</span> <span class='ident'>p</span>.<span class='ident'>dword</span>(<span class='ident'>direction</span>))
                     .<span class='ident'>fold</span>(<span class='number'>0</span>, <span class='op'>|</span><span class='ident'>acc</span>, <span class='ident'>p</span><span class='op'>|</span> <span class='ident'>acc</span> <span class='op'>|</span> <span class='ident'>p</span>);
             }
+            <span class='ident'>cred_data</span>.<span class='ident'>cCreds</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>certs</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>winapi</span>::<span class='ident'>DWORD</span>;
+            <span class='ident'>cred_data</span>.<span class='ident'>paCred</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>certs</span>.<span class='ident'>as_ptr</span>() <span class='kw'>as</span> <span class='op'>*</span><span class='kw-2'>mut</span> _;
 
             <span class='kw'>let</span> <span class='ident'>direction</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>direction</span> {
                 <span class='ident'>Direction</span>::<span class='ident'>Inbound</span> <span class='op'>=&gt;</span> <span class='ident'>winapi</span>::<span class='ident'>SECPKG_CRED_INBOUND</span>,

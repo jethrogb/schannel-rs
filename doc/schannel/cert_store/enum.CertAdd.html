@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `CertAdd` enum in crate `schannel`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, CertAdd">
+
+    <title>schannel::cert_store::CertAdd - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'><a href='../index.html'>schannel</a>::<wbr><a href='index.html'>cert_store</a></p><script>window.sidebarCurrent = {name: 'CertAdd', ty: 'enum', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content enum">
+<h1 class='fqn'><span class='in-band'>Enum <a href='../index.html'>schannel</a>::<wbr><a href='index.html'>cert_store</a>::<wbr><a class='enum' href=''>CertAdd</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-127' class='srclink' href='../../src/schannel/src/cert_store.rs.html#59-110' title='goto source code'>[src]</a></span></h1>
+<pre class='rust enum'>pub enum CertAdd {
+    Always,
+    New,
+    Newer,
+    NewerInheritProperties,
+    ReplaceExisting,
+    ReplaceExistingInheritProperties,
+    UseExisting,
+}</pre><div class='docblock'><p>Argument to the <code>add_cert</code> function indicating how a certificate should be
+added to a <code>CertStore</code>.</p>
+</div><h2 class='variants'>Variants</h2>
+<span id='variant.Always' class='variant'><code>Always</code></span><div class='docblock'><p>The function makes no check for an existing matching certificate or link
+to a matching certificate. A new certificate is always added to the
+store. This can lead to duplicates in a store.</p>
+</div><span id='variant.New' class='variant'><code>New</code></span><div class='docblock'><p>If a matching certificate or a link to a matching certificate exists,
+the operation fails.</p>
+</div><span id='variant.Newer' class='variant'><code>Newer</code></span><div class='docblock'><p>If a matching certificate or a link to a matching certificate exists and
+the NotBefore time of the existing context is equal to or greater than
+the NotBefore time of the new context being added, the operation fails.</p>
+
+<p>If the NotBefore time of the existing context is less than the NotBefore
+time of the new context being added, the existing certificate or link is
+deleted and a new certificate is created and added to the store. If a
+matching certificate or a link to a matching certificate does not exist,
+a new link is added.</p>
+</div><span id='variant.NewerInheritProperties' class='variant'><code>NewerInheritProperties</code></span><div class='docblock'><p>If a matching certificate or a link to a matching certificate exists and
+the NotBefore time of the existing context is equal to or greater than
+the NotBefore time of the new context being added, the operation fails.</p>
+
+<p>If the NotBefore time of the existing context is less than the NotBefore
+time of the new context being added, the existing context is deleted
+before creating and adding the new context. The new added context
+inherits properties from the existing certificate.</p>
+</div><span id='variant.ReplaceExisting' class='variant'><code>ReplaceExisting</code></span><div class='docblock'><p>If a link to a matching certificate exists, that existing certificate or
+link is deleted and a new certificate is created and added to the store.
+If a matching certificate or a link to a matching certificate does not
+exist, a new link is added.</p>
+</div><span id='variant.ReplaceExistingInheritProperties' class='variant'><code>ReplaceExistingInheritProperties</code></span><div class='docblock'><p>If a matching certificate exists in the store, the existing context is
+not replaced. The existing context inherits properties from the new
+certificate.</p>
+</div><span id='variant.UseExisting' class='variant'><code>UseExisting</code></span><div class='docblock'><p>If a matching certificate or a link to a matching certificate exists,
+that existing certificate or link is used and properties from the
+new certificate are added. The function does not fail, but it does
+not add a new context. The existing context is duplicated and returned.</p>
+
+<p>If a matching certificate or a link to a matching certificate does
+not exist, a new certificate is added.</p>
+</div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../";
+        window.currentCrate = "schannel";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../../jquery.js"></script>
+    <script src="../../main.js"></script>
+    
+    <script defer src="../../search-index.js"></script>
+</body>
+</html>

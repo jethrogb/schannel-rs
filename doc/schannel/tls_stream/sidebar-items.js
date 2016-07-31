@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Builder","A builder type for `TlsStream`s."],["TlsStream","An Schannel TLS stream."]]});
+initSidebarItems({"enum":[["HandshakeError","A failure which can happen during the `Builder::initialize` phase, either an I/O error or an intermediate stream which has not completed its handshake."]],"struct":[["Builder","A builder type for `TlsStream`s."],["MidHandshakeTlsStream","A stream which has not yet completed its handshake."],["TlsStream","An Schannel TLS stream."]]});

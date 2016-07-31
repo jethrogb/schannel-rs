@@ -81,6 +81,31 @@
 <span id="37">37</span>
 <span id="38">38</span>
 <span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Bindings to the Windows SChannel APIs.</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>warn</span>(<span class='ident'>missing_docs</span>)]</span>
@@ -88,28 +113,32 @@
 
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>crypt32</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>kernel32</span>;
-<span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>libc</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>secur32</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>winapi</span>;
 
 <span class='attribute'>#[<span class='ident'>macro_use</span>]</span>
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>lazy_static</span>;
 
-<span class='attribute'>#[<span class='ident'>allow</span>(<span class='ident'>dead_code</span>)]</span>
-<span class='comment'>/* pub */</span> <span class='kw'>mod</span> <span class='ident'>cert_store</span>;
-<span class='attribute'>#[<span class='ident'>allow</span>(<span class='ident'>dead_code</span>)]</span>
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>ptr</span>;
+
+<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>cert_context</span>;
+<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>cert_store</span>;
 <span class='comment'>/* pub */</span> <span class='kw'>mod</span> <span class='ident'>ctl_context</span>;
 <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>schannel_cred</span>;
 <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>tls_stream</span>;
 
-<span class='kw'>mod</span> <span class='ident'>cert_context</span>;
 <span class='kw'>mod</span> <span class='ident'>context_buffer</span>;
 <span class='kw'>mod</span> <span class='ident'>security_context</span>;
 
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
 <span class='kw'>mod</span> <span class='ident'>test</span>;
 
-<span class='kw'>const</span> <span class='ident'>INIT_REQUESTS</span>: <span class='ident'>libc</span>::<span class='ident'>c_ulong</span> <span class='op'>=</span>
+<span class='kw'>const</span> <span class='ident'>ACCEPT_REQUESTS</span>: <span class='ident'>winapi</span>::<span class='ident'>c_ulong</span> <span class='op'>=</span>
+    <span class='ident'>winapi</span>::<span class='ident'>ASC_REQ_ALLOCATE_MEMORY</span> <span class='op'>|</span> <span class='ident'>winapi</span>::<span class='ident'>ASC_REQ_CONFIDENTIALITY</span> <span class='op'>|</span>
+    <span class='ident'>winapi</span>::<span class='ident'>ASC_REQ_SEQUENCE_DETECT</span> <span class='op'>|</span> <span class='ident'>winapi</span>::<span class='ident'>ASC_REQ_STREAM</span> <span class='op'>|</span>
+    <span class='ident'>winapi</span>::<span class='ident'>ASC_REQ_REPLAY_DETECT</span>;
+
+<span class='kw'>const</span> <span class='ident'>INIT_REQUESTS</span>: <span class='ident'>winapi</span>::<span class='ident'>c_ulong</span> <span class='op'>=</span>
     <span class='ident'>winapi</span>::<span class='ident'>ISC_REQ_CONFIDENTIALITY</span> <span class='op'>|</span> <span class='ident'>winapi</span>::<span class='ident'>ISC_REQ_INTEGRITY</span> <span class='op'>|</span> <span class='ident'>winapi</span>::<span class='ident'>ISC_REQ_REPLAY_DETECT</span> <span class='op'>|</span>
     <span class='ident'>winapi</span>::<span class='ident'>ISC_REQ_SEQUENCE_DETECT</span> <span class='op'>|</span> <span class='ident'>winapi</span>::<span class='ident'>ISC_REQ_MANUAL_CRED_VALIDATION</span> <span class='op'>|</span>
     <span class='ident'>winapi</span>::<span class='ident'>ISC_REQ_ALLOCATE_MEMORY</span> <span class='op'>|</span> <span class='ident'>winapi</span>::<span class='ident'>ISC_REQ_STREAM</span>;
@@ -120,6 +149,27 @@
     <span class='kw'>fn</span> <span class='ident'>as_inner</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>T</span>;
 
     <span class='kw'>fn</span> <span class='ident'>get_mut</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>T</span>;
+}
+
+<span class='kw'>unsafe</span> <span class='kw'>fn</span> <span class='ident'>secbuf</span>(<span class='ident'>buftype</span>: <span class='ident'>winapi</span>::<span class='ident'>c_ulong</span>,
+                 <span class='ident'>bytes</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='ident'>u8</span>]<span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>winapi</span>::<span class='ident'>SecBuffer</span> {
+    <span class='kw'>let</span> (<span class='ident'>ptr</span>, <span class='ident'>len</span>) <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>bytes</span> {
+        <span class='prelude-val'>Some</span>(<span class='ident'>bytes</span>) <span class='op'>=&gt;</span> (<span class='ident'>bytes</span>.<span class='ident'>as_mut_ptr</span>(), <span class='ident'>bytes</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>winapi</span>::<span class='ident'>c_ulong</span>),
+        <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> (<span class='ident'>ptr</span>::<span class='ident'>null_mut</span>(), <span class='number'>0</span>),
+    };
+    <span class='ident'>winapi</span>::<span class='ident'>SecBuffer</span> {
+        <span class='ident'>BufferType</span>: <span class='ident'>buftype</span>,
+        <span class='ident'>cbBuffer</span>: <span class='ident'>len</span>,
+        <span class='ident'>pvBuffer</span>: <span class='ident'>ptr</span> <span class='kw'>as</span> <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>winapi</span>::<span class='ident'>c_void</span>,
+    }
+}
+
+<span class='kw'>unsafe</span> <span class='kw'>fn</span> <span class='ident'>secbuf_desc</span>(<span class='ident'>bufs</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='ident'>winapi</span>::<span class='ident'>SecBuffer</span>]) <span class='op'>-&gt;</span> <span class='ident'>winapi</span>::<span class='ident'>SecBufferDesc</span> {
+    <span class='ident'>winapi</span>::<span class='ident'>SecBufferDesc</span> {
+        <span class='ident'>ulVersion</span>: <span class='ident'>winapi</span>::<span class='ident'>SECBUFFER_VERSION</span>,
+        <span class='ident'>cBuffers</span>: <span class='ident'>bufs</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>winapi</span>::<span class='ident'>c_ulong</span>,
+        <span class='ident'>pBuffers</span>: <span class='ident'>bufs</span>.<span class='ident'>as_mut_ptr</span>(),
+    }
 }
 </pre>
 </section>
