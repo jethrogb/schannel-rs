@@ -811,6 +811,26 @@
 <span id="767">767</span>
 <span id="768">768</span>
 <span id="769">769</span>
+<span id="770">770</span>
+<span id="771">771</span>
+<span id="772">772</span>
+<span id="773">773</span>
+<span id="774">774</span>
+<span id="775">775</span>
+<span id="776">776</span>
+<span id="777">777</span>
+<span id="778">778</span>
+<span id="779">779</span>
+<span id="780">780</span>
+<span id="781">781</span>
+<span id="782">782</span>
+<span id="783">783</span>
+<span id="784">784</span>
+<span id="785">785</span>
+<span id="786">786</span>
+<span id="787">787</span>
+<span id="788">788</span>
+<span id="789">789</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Schannel TLS streams.</span>
 <span class='kw'>use</span> <span class='ident'>crypt32</span>;
@@ -953,7 +973,7 @@
                 <span class='ident'>more_calls</span>: <span class='bool-val'>true</span>,
                 <span class='ident'>shutting_down</span>: <span class='bool-val'>false</span>,
             },
-            <span class='ident'>needs_read</span>: <span class='bool-val'>true</span>,
+            <span class='ident'>needs_read</span>: <span class='number'>1</span>,
             <span class='ident'>dec_in</span>: <span class='ident'>Cursor</span>::<span class='ident'>new</span>(<span class='ident'>Vec</span>::<span class='ident'>new</span>()),
             <span class='ident'>enc_in</span>: <span class='ident'>Cursor</span>::<span class='ident'>new</span>(<span class='ident'>Vec</span>::<span class='ident'>new</span>()),
             <span class='ident'>out_buf</span>: <span class='ident'>Cursor</span>::<span class='ident'>new</span>(<span class='ident'>buf</span>.<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>b</span><span class='op'>|</span> <span class='ident'>b</span>.<span class='ident'>to_owned</span>()).<span class='ident'>unwrap_or</span>(<span class='ident'>Vec</span>::<span class='ident'>new</span>())),
@@ -985,7 +1005,7 @@
     <span class='ident'>state</span>: <span class='ident'>State</span>,
     <span class='ident'>accept</span>: <span class='ident'>bool</span>,
     <span class='ident'>accept_first</span>: <span class='ident'>bool</span>,
-    <span class='ident'>needs_read</span>: <span class='ident'>bool</span>,
+    <span class='ident'>needs_read</span>: <span class='ident'>usize</span>,
     <span class='comment'>// valid from position() to len()</span>
     <span class='ident'>dec_in</span>: <span class='ident'>Cursor</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;&gt;</span>,
     <span class='comment'>// valid from 0 to position()</span>
@@ -1094,7 +1114,7 @@
                     <span class='ident'>more_calls</span>: <span class='bool-val'>true</span>,
                     <span class='ident'>shutting_down</span>: <span class='bool-val'>true</span>,
                 };
-                <span class='self'>self</span>.<span class='ident'>needs_read</span> <span class='op'>=</span> <span class='bool-val'>false</span>;
+                <span class='self'>self</span>.<span class='ident'>needs_read</span> <span class='op'>=</span> <span class='number'>0</span>;
             }
         }
 
@@ -1181,11 +1201,15 @@
                     <span class='kw'>let</span> <span class='ident'>to_write</span> <span class='op'>=</span> <span class='ident'>ContextBuffer</span>(<span class='ident'>outbufs</span>[<span class='number'>0</span>]);
 
                     <span class='self'>self</span>.<span class='ident'>consume_enc_in</span>(<span class='ident'>nread</span>);
-                    <span class='self'>self</span>.<span class='ident'>needs_read</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>enc_in</span>.<span class='ident'>position</span>() <span class='op'>==</span> <span class='number'>0</span>;
+                    <span class='self'>self</span>.<span class='ident'>needs_read</span> <span class='op'>=</span> (<span class='self'>self</span>.<span class='ident'>enc_in</span>.<span class='ident'>position</span>() <span class='op'>==</span> <span class='number'>0</span>) <span class='kw'>as</span> <span class='ident'>usize</span>;
                     <span class='self'>self</span>.<span class='ident'>out_buf</span>.<span class='ident'>get_mut</span>().<span class='ident'>extend_from_slice</span>(<span class='kw-2'>&amp;</span><span class='ident'>to_write</span>);
                 }
                 <span class='ident'>winapi</span>::<span class='ident'>SEC_E_INCOMPLETE_MESSAGE</span> <span class='op'>=&gt;</span> {
-                    <span class='self'>self</span>.<span class='ident'>needs_read</span> <span class='op'>=</span> <span class='bool-val'>true</span>;
+                    <span class='self'>self</span>.<span class='ident'>needs_read</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='ident'>inbufs</span>[<span class='number'>1</span>].<span class='ident'>BufferType</span> <span class='op'>==</span> <span class='ident'>winapi</span>::<span class='ident'>SECBUFFER_MISSING</span> {
+                        <span class='ident'>inbufs</span>[<span class='number'>1</span>].<span class='ident'>cbBuffer</span> <span class='kw'>as</span> <span class='ident'>usize</span>
+                    } <span class='kw'>else</span> {
+                        <span class='number'>1</span>
+                    };
                 }
                 <span class='ident'>winapi</span>::<span class='ident'>SEC_E_OK</span> <span class='op'>=&gt;</span> {
                     <span class='kw'>let</span> <span class='ident'>nread</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='ident'>inbufs</span>[<span class='number'>1</span>].<span class='ident'>BufferType</span> <span class='op'>==</span> <span class='ident'>winapi</span>::<span class='ident'>SECBUFFER_EXTRA</span> {
@@ -1200,7 +1224,7 @@
                     };
 
                     <span class='self'>self</span>.<span class='ident'>consume_enc_in</span>(<span class='ident'>nread</span>);
-                    <span class='self'>self</span>.<span class='ident'>needs_read</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>enc_in</span>.<span class='ident'>position</span>() <span class='op'>==</span> <span class='number'>0</span>;
+                    <span class='self'>self</span>.<span class='ident'>needs_read</span> <span class='op'>=</span> (<span class='self'>self</span>.<span class='ident'>enc_in</span>.<span class='ident'>position</span>() <span class='op'>==</span> <span class='number'>0</span>) <span class='kw'>as</span> <span class='ident'>usize</span>;
                     <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>to_write</span>) <span class='op'>=</span> <span class='ident'>to_write</span> {
                         <span class='self'>self</span>.<span class='ident'>out_buf</span>.<span class='ident'>get_mut</span>().<span class='ident'>extend_from_slice</span>(<span class='kw-2'>&amp;</span><span class='ident'>to_write</span>);
                     }
@@ -1248,7 +1272,7 @@
                         <span class='kw'>continue</span>;
                     }
 
-                    <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>needs_read</span> {
+                    <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>needs_read</span> <span class='op'>&gt;</span> <span class='number'>0</span> {
                         <span class='kw'>if</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>read_in</span>()) <span class='op'>==</span> <span class='number'>0</span> {
                             <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>io</span>::<span class='ident'>Error</span>::<span class='ident'>new</span>(<span class='ident'>io</span>::<span class='ident'>ErrorKind</span>::<span class='ident'>UnexpectedEof</span>,
                                                       <span class='string'>&quot;unexpected EOF during handshake&quot;</span>));
@@ -1355,17 +1379,27 @@
     }
 
     <span class='kw'>fn</span> <span class='ident'>read_in</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>io</span>::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='ident'>existing_len</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>enc_in</span>.<span class='ident'>position</span>() <span class='kw'>as</span> <span class='ident'>usize</span>;
-        <span class='kw'>let</span> <span class='ident'>min_len</span> <span class='op'>=</span> <span class='ident'>cmp</span>::<span class='ident'>max</span>(<span class='number'>1024</span>, <span class='number'>2</span> <span class='op'>*</span> <span class='ident'>existing_len</span>);
-        <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>enc_in</span>.<span class='ident'>get_ref</span>().<span class='ident'>len</span>() <span class='op'>&lt;</span> <span class='ident'>min_len</span> {
-            <span class='self'>self</span>.<span class='ident'>enc_in</span>.<span class='ident'>get_mut</span>().<span class='ident'>resize</span>(<span class='ident'>min_len</span>, <span class='number'>0</span>);
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>sum_nread</span> <span class='op'>=</span> <span class='number'>0</span>;
+
+        <span class='kw'>while</span> <span class='self'>self</span>.<span class='ident'>needs_read</span> <span class='op'>&gt;</span> <span class='number'>0</span> {
+            <span class='kw'>let</span> <span class='ident'>existing_len</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>enc_in</span>.<span class='ident'>position</span>() <span class='kw'>as</span> <span class='ident'>usize</span>;
+            <span class='kw'>let</span> <span class='ident'>min_len</span> <span class='op'>=</span> <span class='ident'>cmp</span>::<span class='ident'>max</span>(<span class='ident'>cmp</span>::<span class='ident'>max</span>(<span class='number'>1024</span>, <span class='number'>2</span> <span class='op'>*</span> <span class='ident'>existing_len</span>), <span class='self'>self</span>.<span class='ident'>needs_read</span>);
+            <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>enc_in</span>.<span class='ident'>get_ref</span>().<span class='ident'>len</span>() <span class='op'>&lt;</span> <span class='ident'>min_len</span> {
+                <span class='self'>self</span>.<span class='ident'>enc_in</span>.<span class='ident'>get_mut</span>().<span class='ident'>resize</span>(<span class='ident'>min_len</span>, <span class='number'>0</span>);
+            }
+            <span class='kw'>let</span> <span class='ident'>nread</span> <span class='op'>=</span> {
+                <span class='kw'>let</span> <span class='ident'>buf</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>.<span class='ident'>enc_in</span>.<span class='ident'>get_mut</span>()[<span class='ident'>existing_len</span>..];
+                <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>stream</span>.<span class='ident'>read</span>(<span class='ident'>buf</span>))
+            };
+            <span class='self'>self</span>.<span class='ident'>enc_in</span>.<span class='ident'>set_position</span>((<span class='ident'>existing_len</span> <span class='op'>+</span> <span class='ident'>nread</span>) <span class='kw'>as</span> <span class='ident'>u64</span>);
+            <span class='self'>self</span>.<span class='ident'>needs_read</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>needs_read</span>.<span class='ident'>saturating_sub</span>(<span class='ident'>nread</span>);
+            <span class='kw'>if</span> <span class='ident'>nread</span> <span class='op'>==</span> <span class='number'>0</span> {
+                <span class='kw'>break</span>;
+            }
+            <span class='ident'>sum_nread</span> <span class='op'>+=</span> <span class='ident'>nread</span>;
         }
-        <span class='kw'>let</span> <span class='ident'>nread</span> <span class='op'>=</span> {
-            <span class='kw'>let</span> <span class='ident'>buf</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>.<span class='ident'>enc_in</span>.<span class='ident'>get_mut</span>()[<span class='ident'>existing_len</span>..];
-            <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>stream</span>.<span class='ident'>read</span>(<span class='ident'>buf</span>))
-        };
-        <span class='self'>self</span>.<span class='ident'>enc_in</span>.<span class='ident'>set_position</span>((<span class='ident'>existing_len</span> <span class='op'>+</span> <span class='ident'>nread</span>) <span class='kw'>as</span> <span class='ident'>u64</span>);
-        <span class='prelude-val'>Ok</span>(<span class='ident'>nread</span>)
+
+        <span class='prelude-val'>Ok</span>(<span class='ident'>sum_nread</span>)
     }
 
     <span class='kw'>fn</span> <span class='ident'>consume_enc_in</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>nread</span>: <span class='ident'>usize</span>) {
@@ -1409,19 +1443,25 @@
                         <span class='self'>self</span>.<span class='ident'>enc_in</span>.<span class='ident'>position</span>() <span class='kw'>as</span> <span class='ident'>usize</span>
                     };
                     <span class='self'>self</span>.<span class='ident'>consume_enc_in</span>(<span class='ident'>nread</span>);
-                    <span class='self'>self</span>.<span class='ident'>needs_read</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>enc_in</span>.<span class='ident'>position</span>() <span class='op'>==</span> <span class='number'>0</span>;
+                    <span class='self'>self</span>.<span class='ident'>needs_read</span> <span class='op'>=</span> (<span class='self'>self</span>.<span class='ident'>enc_in</span>.<span class='ident'>position</span>() <span class='op'>==</span> <span class='number'>0</span>) <span class='kw'>as</span> <span class='ident'>usize</span>;
                     <span class='prelude-val'>Ok</span>(())
                 }
                 <span class='ident'>winapi</span>::<span class='ident'>SEC_E_INCOMPLETE_MESSAGE</span> <span class='op'>=&gt;</span> {
-                    <span class='self'>self</span>.<span class='ident'>needs_read</span> <span class='op'>=</span> <span class='bool-val'>true</span>;
+                    <span class='self'>self</span>.<span class='ident'>needs_read</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='ident'>bufs</span>[<span class='number'>1</span>].<span class='ident'>BufferType</span> <span class='op'>==</span> <span class='ident'>winapi</span>::<span class='ident'>SECBUFFER_MISSING</span> {
+                        <span class='ident'>bufs</span>[<span class='number'>1</span>].<span class='ident'>cbBuffer</span> <span class='kw'>as</span> <span class='ident'>usize</span>
+                    } <span class='kw'>else</span> {
+                        <span class='number'>1</span>
+                    };
                     <span class='prelude-val'>Ok</span>(())
                 }
-                <span class='ident'>state</span> @ <span class='ident'>winapi</span>::<span class='ident'>SEC_I_CONTEXT_EXPIRED</span> <span class='op'>|</span>
-                <span class='ident'>state</span> @ <span class='ident'>winapi</span>::<span class='ident'>SEC_I_RENEGOTIATE</span> <span class='op'>=&gt;</span> {
+                <span class='ident'>winapi</span>::<span class='ident'>SEC_I_CONTEXT_EXPIRED</span> <span class='op'>=&gt;</span> {
+                    <span class='self'>self</span>.<span class='ident'>shutdown</span>()
+                }
+                <span class='ident'>winapi</span>::<span class='ident'>SEC_I_RENEGOTIATE</span> <span class='op'>=&gt;</span> {
                     <span class='self'>self</span>.<span class='ident'>state</span> <span class='op'>=</span> <span class='ident'>State</span>::<span class='ident'>Initializing</span> {
                         <span class='ident'>needs_flush</span>: <span class='bool-val'>false</span>,
                         <span class='ident'>more_calls</span>: <span class='bool-val'>true</span>,
-                        <span class='ident'>shutting_down</span>: <span class='ident'>state</span> <span class='op'>==</span> <span class='ident'>winapi</span>::<span class='ident'>SEC_I_CONTEXT_EXPIRED</span>,
+                        <span class='ident'>shutting_down</span>: <span class='bool-val'>false</span>,
                     };
 
                     <span class='kw'>let</span> <span class='ident'>nread</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='ident'>bufs</span>[<span class='number'>3</span>].<span class='ident'>BufferType</span> <span class='op'>==</span> <span class='ident'>winapi</span>::<span class='ident'>SECBUFFER_EXTRA</span> {
@@ -1430,7 +1470,7 @@
                         <span class='self'>self</span>.<span class='ident'>enc_in</span>.<span class='ident'>position</span>() <span class='kw'>as</span> <span class='ident'>usize</span>
                     };
                     <span class='self'>self</span>.<span class='ident'>consume_enc_in</span>(<span class='ident'>nread</span>);
-                    <span class='self'>self</span>.<span class='ident'>needs_read</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>enc_in</span>.<span class='ident'>position</span>() <span class='op'>==</span> <span class='number'>0</span>;
+                    <span class='self'>self</span>.<span class='ident'>needs_read</span> <span class='op'>=</span> (<span class='self'>self</span>.<span class='ident'>enc_in</span>.<span class='ident'>position</span>() <span class='op'>==</span> <span class='number'>0</span>) <span class='kw'>as</span> <span class='ident'>usize</span>;
                     <span class='prelude-val'>Ok</span>(())
                 }
                 <span class='ident'>e</span> <span class='op'>=&gt;</span> {
@@ -1562,11 +1602,11 @@
                 <span class='kw'>break</span>;
             }
 
-            <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>needs_read</span> {
+            <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>needs_read</span> <span class='op'>&gt;</span> <span class='number'>0</span> {
                 <span class='kw'>if</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>read_in</span>()) <span class='op'>==</span> <span class='number'>0</span> {
                     <span class='kw'>break</span>;
                 }
-                <span class='self'>self</span>.<span class='ident'>needs_read</span> <span class='op'>=</span> <span class='bool-val'>false</span>;
+                <span class='self'>self</span>.<span class='ident'>needs_read</span> <span class='op'>=</span> <span class='number'>0</span>;
             }
 
             <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>decrypt</span>());
