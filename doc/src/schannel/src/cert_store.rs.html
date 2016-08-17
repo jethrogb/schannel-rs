@@ -466,6 +466,11 @@
 <span id="422">422</span>
 <span id="423">423</span>
 <span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Bindings to winapi&#39;s certificate-store related APIs.</span>
 
@@ -883,12 +888,17 @@
     <span class='kw'>fn</span> <span class='ident'>pfx_import</span>() {
         <span class='kw'>let</span> <span class='ident'>pfx</span> <span class='op'>=</span> <span class='macro'>include_bytes</span><span class='macro'>!</span>(<span class='string'>&quot;../test/identity.p12&quot;</span>);
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>store</span> <span class='op'>=</span> <span class='ident'>PfxImportOptions</span>::<span class='ident'>new</span>()
-                        .<span class='ident'>no_persist_key</span>(<span class='bool-val'>true</span>)
                         .<span class='ident'>include_extended_properties</span>(<span class='bool-val'>true</span>)
                         .<span class='ident'>password</span>(<span class='string'>&quot;mypass&quot;</span>)
                         .<span class='ident'>import</span>(<span class='ident'>pfx</span>)
                         .<span class='ident'>unwrap</span>();
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>store</span>.<span class='ident'>certs</span>().<span class='ident'>count</span>(), <span class='number'>2</span>);
+        <span class='kw'>let</span> <span class='ident'>pkeys</span> <span class='op'>=</span> <span class='ident'>store</span>.<span class='ident'>certs</span>()
+                         .<span class='ident'>filter</span>(<span class='op'>|</span><span class='ident'>c</span><span class='op'>|</span> {
+                             <span class='ident'>c</span>.<span class='ident'>private_key</span>().<span class='ident'>compare_key</span>(<span class='bool-val'>true</span>).<span class='ident'>silent</span>(<span class='bool-val'>true</span>).<span class='ident'>acquire</span>().<span class='ident'>is_ok</span>()
+                         })
+                         .<span class='ident'>count</span>();
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>pkeys</span>, <span class='number'>1</span>);
     }
 }
 </pre>

@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["KeyHandle","A handle to a private key."]]});

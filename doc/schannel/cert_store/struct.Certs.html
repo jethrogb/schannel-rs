@@ -47,12 +47,12 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-177' class='srclink' href='../../src/schannel/src/cert_store.rs.html#241-244' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-210' class='srclink' href='../../src/schannel/src/cert_store.rs.html#241-244' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct Certs&lt;'a&gt; {
     // some fields omitted
 }</pre><div class='docblock'><p>An iterator over the certificates contained in a <code>CertStore</code>, returned by
 <code>CertStore::iter</code></p>
-</div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl&lt;'a&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/iter/iterator/trait.Iterator.html' title='core::iter::iterator::Iterator'>Iterator</a> for <a class='struct' href='../../schannel/cert_store/struct.Certs.html' title='schannel::cert_store::Certs'>Certs</a>&lt;'a&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-181' class='srclink' href='../../src/schannel/src/cert_store.rs.html#246-269' title='goto source code'>[src]</a></span></h3>
+</div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl&lt;'a&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/iter/iterator/trait.Iterator.html' title='core::iter::iterator::Iterator'>Iterator</a> for <a class='struct' href='../../schannel/cert_store/struct.Certs.html' title='schannel::cert_store::Certs'>Certs</a>&lt;'a&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-214' class='srclink' href='../../src/schannel/src/cert_store.rs.html#246-269' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='associatedtype.Item' class='type'><code>type <a href='https://doc.rust-lang.org/nightly/core/iter/iterator/trait.Iterator.html#associatedtype.Item' class='type'>Item</a> = <a class='struct' href='../../schannel/cert_context/struct.CertContext.html' title='schannel::cert_context::CertContext'>CertContext</a></code></h4>
 <div class='docblock'><p>The type of the elements being iterated over.</p>
 </div><h4 id='method.next' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/iter/iterator/trait.Iterator.html#tymethod.next' class='fnname'>next</a>(&amp;mut self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='../../schannel/cert_context/struct.CertContext.html' title='schannel::cert_context::CertContext'>CertContext</a>&gt;</code></h4>

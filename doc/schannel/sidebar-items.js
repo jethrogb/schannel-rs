@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["cert_context","Bindings to winapi's `PCCERT_CONTEXT` APIs."],["cert_store","Bindings to winapi's certificate-store related APIs."],["schannel_cred","Schannel credentials."],["tls_stream","Schannel TLS streams."]]});
+initSidebarItems({"mod":[["cert_context","Bindings to winapi's `PCCERT_CONTEXT` APIs."],["cert_store","Bindings to winapi's certificate-store related APIs."],["key_handle","Private keys."],["schannel_cred","Schannel credentials."],["tls_stream","Schannel TLS streams."]]});

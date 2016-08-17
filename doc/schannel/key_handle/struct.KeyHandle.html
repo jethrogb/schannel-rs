@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="API documentation for the Rust `tls_stream` mod in crate `schannel`.">
-    <meta name="keywords" content="rust, rustlang, rust-lang, tls_stream">
+    <meta name="description" content="API documentation for the Rust `KeyHandle` struct in crate `schannel`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, KeyHandle">
 
-    <title>schannel::tls_stream - Rust</title>
+    <title>schannel::key_handle::KeyHandle - Rust</title>
 
     <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../main.css">
@@ -28,7 +28,7 @@
 
     <nav class="sidebar">
         
-        <p class='location'><a href='../index.html'>schannel</a></p><script>window.sidebarCurrent = {name: 'tls_stream', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script>
+        <p class='location'><a href='../index.html'>schannel</a>::<wbr><a href='index.html'>key_handle</a></p><script>window.sidebarCurrent = {name: 'KeyHandle', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
     </nav>
 
     <nav class="sub">
@@ -42,45 +42,19 @@
         </form>
     </nav>
 
-    <section id='main' class="content mod">
-<h1 class='fqn'><span class='in-band'>Module <a href='../index.html'>schannel</a>::<wbr><a class='mod' href=''>tls_stream</a></span><span class='out-of-band'><span id='render-detail'>
+    <section id='main' class="content struct">
+<h1 class='fqn'><span class='in-band'>Struct <a href='../index.html'>schannel</a>::<wbr><a href='index.html'>key_handle</a>::<wbr><a class='struct' href=''>KeyHandle</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-603' class='srclink' href='../../src/schannel/src/tls_stream.rs.html#1-789' title='goto source code'>[src]</a></span></h1>
-<div class='docblock'><p>Schannel TLS streams.</p>
-</div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
-<table>
-                       <tr class=' module-item'>
-                           <td><a class='struct' href='struct.Builder.html'
-                                  title='schannel::tls_stream::Builder'>Builder</a></td>
-                           <td class='docblock short'>
-                                <p>A builder type for <code>TlsStream</code>s.</p>
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class='struct' href='struct.MidHandshakeTlsStream.html'
-                                  title='schannel::tls_stream::MidHandshakeTlsStream'>MidHandshakeTlsStream</a></td>
-                           <td class='docblock short'>
-                                <p>A stream which has not yet completed its handshake.</p>
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class='struct' href='struct.TlsStream.html'
-                                  title='schannel::tls_stream::TlsStream'>TlsStream</a></td>
-                           <td class='docblock short'>
-                                <p>An Schannel TLS stream.</p>
-                           </td>
-                       </tr></table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
-<table>
-                       <tr class=' module-item'>
-                           <td><a class='enum' href='enum.HandshakeError.html'
-                                  title='schannel::tls_stream::HandshakeError'>HandshakeError</a></td>
-                           <td class='docblock short'>
-                                <p>A failure which can happen during the <code>Builder::initialize</code> phase, either an
-I/O error or an intermediate stream which has not completed its handshake.</p>
-                           </td>
-                       </tr></table></section>
+               </span><a id='src-354' class='srclink' href='../../src/schannel/src/key_handle.rs.html#9-12' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct KeyHandle {
+    // some fields omitted
+}</pre><div class='docblock'><p>A handle to a private key.</p>
+</div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html' title='core::ops::Drop'>Drop</a> for <a class='struct' href='../../schannel/key_handle/struct.KeyHandle.html' title='schannel::key_handle::KeyHandle'>KeyHandle</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-360' class='srclink' href='../../src/schannel/src/key_handle.rs.html#19-29' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.drop' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html#tymethod.drop' class='fnname'>drop</a>(&amp;mut self)</code></h4>
+<div class='docblock'><p>A method called when the value goes out of scope. <a href="https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html#tymethod.drop">Read more</a></p>
+</div></div></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>
