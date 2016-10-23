@@ -47,7 +47,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-163' class='srclink' href='../../src/schannel/src/cert_store.rs.html#64-115' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-153' class='srclink' href='../../src/schannel/src/cert_store.rs.html#64-115' title='goto source code'>[src]</a></span></h1>
 <pre class='rust enum'>pub enum CertAdd {
     Always,
     New,
@@ -59,12 +59,12 @@
 }</pre><div class='docblock'><p>Argument to the <code>add_cert</code> function indicating how a certificate should be
 added to a <code>CertStore</code>.</p>
 </div><h2 class='variants'>Variants</h2>
-<span id='variant.Always' class='variant'><code>Always</code></span><div class='docblock'><p>The function makes no check for an existing matching certificate or link
+<span id='variant.Always' class='variant'><span id='Always.v' class='invisible'><code>Always</code></span></span><div class='docblock'><p>The function makes no check for an existing matching certificate or link
 to a matching certificate. A new certificate is always added to the
 store. This can lead to duplicates in a store.</p>
-</div><span id='variant.New' class='variant'><code>New</code></span><div class='docblock'><p>If a matching certificate or a link to a matching certificate exists,
+</div><span id='variant.New' class='variant'><span id='New.v' class='invisible'><code>New</code></span></span><div class='docblock'><p>If a matching certificate or a link to a matching certificate exists,
 the operation fails.</p>
-</div><span id='variant.Newer' class='variant'><code>Newer</code></span><div class='docblock'><p>If a matching certificate or a link to a matching certificate exists and
+</div><span id='variant.Newer' class='variant'><span id='Newer.v' class='invisible'><code>Newer</code></span></span><div class='docblock'><p>If a matching certificate or a link to a matching certificate exists and
 the NotBefore time of the existing context is equal to or greater than
 the NotBefore time of the new context being added, the operation fails.</p>
 
@@ -73,7 +73,7 @@ time of the new context being added, the existing certificate or link is
 deleted and a new certificate is created and added to the store. If a
 matching certificate or a link to a matching certificate does not exist,
 a new link is added.</p>
-</div><span id='variant.NewerInheritProperties' class='variant'><code>NewerInheritProperties</code></span><div class='docblock'><p>If a matching certificate or a link to a matching certificate exists and
+</div><span id='variant.NewerInheritProperties' class='variant'><span id='NewerInheritProperties.v' class='invisible'><code>NewerInheritProperties</code></span></span><div class='docblock'><p>If a matching certificate or a link to a matching certificate exists and
 the NotBefore time of the existing context is equal to or greater than
 the NotBefore time of the new context being added, the operation fails.</p>
 
@@ -81,14 +81,14 @@ the NotBefore time of the new context being added, the operation fails.</p>
 time of the new context being added, the existing context is deleted
 before creating and adding the new context. The new added context
 inherits properties from the existing certificate.</p>
-</div><span id='variant.ReplaceExisting' class='variant'><code>ReplaceExisting</code></span><div class='docblock'><p>If a link to a matching certificate exists, that existing certificate or
+</div><span id='variant.ReplaceExisting' class='variant'><span id='ReplaceExisting.v' class='invisible'><code>ReplaceExisting</code></span></span><div class='docblock'><p>If a link to a matching certificate exists, that existing certificate or
 link is deleted and a new certificate is created and added to the store.
 If a matching certificate or a link to a matching certificate does not
 exist, a new link is added.</p>
-</div><span id='variant.ReplaceExistingInheritProperties' class='variant'><code>ReplaceExistingInheritProperties</code></span><div class='docblock'><p>If a matching certificate exists in the store, the existing context is
+</div><span id='variant.ReplaceExistingInheritProperties' class='variant'><span id='ReplaceExistingInheritProperties.v' class='invisible'><code>ReplaceExistingInheritProperties</code></span></span><div class='docblock'><p>If a matching certificate exists in the store, the existing context is
 not replaced. The existing context inherits properties from the new
 certificate.</p>
-</div><span id='variant.UseExisting' class='variant'><code>UseExisting</code></span><div class='docblock'><p>If a matching certificate or a link to a matching certificate exists,
+</div><span id='variant.UseExisting' class='variant'><span id='UseExisting.v' class='invisible'><code>UseExisting</code></span></span><div class='docblock'><p>If a matching certificate or a link to a matching certificate exists,
 that existing certificate or link is used and properties from the
 new certificate are added. The function does not fail, but it does
 not add a new context. The existing context is duplicated and returned.</p>
@@ -151,11 +151,9 @@ not exist, a new certificate is added.</p>
     <script>
         window.rootPath = "../../";
         window.currentCrate = "schannel";
-        window.playgroundUrl = "";
     </script>
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
-    
     <script defer src="../../search-index.js"></script>
 </body>
 </html>

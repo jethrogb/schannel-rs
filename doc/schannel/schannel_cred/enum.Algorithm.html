@@ -47,7 +47,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-450' class='srclink' href='../../src/schannel/src/schannel_cred.rs.html#28-99' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-779' class='srclink' href='../../src/schannel/src/schannel_cred.rs.html#28-99' title='goto source code'>[src]</a></span></h1>
 <pre class='rust enum'>pub enum Algorithm {
     Aes,
     Aes128,
@@ -84,48 +84,48 @@
     // some variants omitted
 }</pre><div class='docblock'><p>Algorithms supported by Schannel.</p>
 </div><h2 class='variants'>Variants</h2>
-<span id='variant.Aes' class='variant'><code>Aes</code></span><div class='docblock'><p>Advanced Encryption Standard (AES).</p>
-</div><span id='variant.Aes128' class='variant'><code>Aes128</code></span><div class='docblock'><p>128 bit AES.</p>
-</div><span id='variant.Aes192' class='variant'><code>Aes192</code></span><div class='docblock'><p>192 bit AES.</p>
-</div><span id='variant.Aes256' class='variant'><code>Aes256</code></span><div class='docblock'><p>256 bit AES.</p>
-</div><span id='variant.AgreedkeyAny' class='variant'><code>AgreedkeyAny</code></span><div class='docblock'><p>Temporary algorithm identifier for handles of Diffie-Hellman–agreed keys.</p>
-</div><span id='variant.CylinkMek' class='variant'><code>CylinkMek</code></span><div class='docblock'><p>An algorithm to create a 40-bit DES key that has parity bits and zeroed key bits to make
+<span id='variant.Aes' class='variant'><span id='Aes.v' class='invisible'><code>Aes</code></span></span><div class='docblock'><p>Advanced Encryption Standard (AES).</p>
+</div><span id='variant.Aes128' class='variant'><span id='Aes128.v' class='invisible'><code>Aes128</code></span></span><div class='docblock'><p>128 bit AES.</p>
+</div><span id='variant.Aes192' class='variant'><span id='Aes192.v' class='invisible'><code>Aes192</code></span></span><div class='docblock'><p>192 bit AES.</p>
+</div><span id='variant.Aes256' class='variant'><span id='Aes256.v' class='invisible'><code>Aes256</code></span></span><div class='docblock'><p>256 bit AES.</p>
+</div><span id='variant.AgreedkeyAny' class='variant'><span id='AgreedkeyAny.v' class='invisible'><code>AgreedkeyAny</code></span></span><div class='docblock'><p>Temporary algorithm identifier for handles of Diffie-Hellman–agreed keys.</p>
+</div><span id='variant.CylinkMek' class='variant'><span id='CylinkMek.v' class='invisible'><code>CylinkMek</code></span></span><div class='docblock'><p>An algorithm to create a 40-bit DES key that has parity bits and zeroed key bits to make
 its key length 64 bits.</p>
-</div><span id='variant.Des' class='variant'><code>Des</code></span><div class='docblock'><p>DES encryption algorithm.</p>
-</div><span id='variant.Desx' class='variant'><code>Desx</code></span><div class='docblock'><p>DESX encryption algorithm.</p>
-</div><span id='variant.DhEphem' class='variant'><code>DhEphem</code></span><div class='docblock'><p>Diffie-Hellman ephemeral key exchange algorithm.</p>
-</div><span id='variant.DhSf' class='variant'><code>DhSf</code></span><div class='docblock'><p>Diffie-Hellman store and forward key exchange algorithm.</p>
-</div><span id='variant.DssSign' class='variant'><code>DssSign</code></span><div class='docblock'><p>DSA public key signature algorithm.</p>
-</div><span id='variant.Ecdh' class='variant'><code>Ecdh</code></span><div class='docblock'><p>Elliptic curve Diffie-Hellman key exchange algorithm.</p>
-</div><span id='variant.Ecdsa' class='variant'><code>Ecdsa</code></span><div class='docblock'><p>Elliptic curve digital signature algorithm.</p>
-</div><span id='variant.HashReplaceOwf' class='variant'><code>HashReplaceOwf</code></span><div class='docblock'><p>One way function hashing algorithm.</p>
-</div><span id='variant.HughesMd5' class='variant'><code>HughesMd5</code></span><div class='docblock'><p>Hughes MD5 hashing algorithm.</p>
-</div><span id='variant.Hmac' class='variant'><code>Hmac</code></span><div class='docblock'><p>HMAC keyed hash algorithm.</p>
-</div><span id='variant.Mac' class='variant'><code>Mac</code></span><div class='docblock'><p>MAC keyed hash algorithm.</p>
-</div><span id='variant.Md2' class='variant'><code>Md2</code></span><div class='docblock'><p>MD2 hashing algorithm.</p>
-</div><span id='variant.Md4' class='variant'><code>Md4</code></span><div class='docblock'><p>MD4 hashing algorithm.</p>
-</div><span id='variant.Md5' class='variant'><code>Md5</code></span><div class='docblock'><p>MD5 hashing algorithm.</p>
-</div><span id='variant.NoSign' class='variant'><code>NoSign</code></span><div class='docblock'><p>No signature algorithm..</p>
-</div><span id='variant.Rc2' class='variant'><code>Rc2</code></span><div class='docblock'><p>RC2 block encryption algorithm.</p>
-</div><span id='variant.Rc4' class='variant'><code>Rc4</code></span><div class='docblock'><p>RC4 stream encryption algorithm.</p>
-</div><span id='variant.Rc5' class='variant'><code>Rc5</code></span><div class='docblock'><p>RC5 block encryption algorithm.</p>
-</div><span id='variant.RsaKeyx' class='variant'><code>RsaKeyx</code></span><div class='docblock'><p>RSA public key exchange algorithm.</p>
-</div><span id='variant.RsaSign' class='variant'><code>RsaSign</code></span><div class='docblock'><p>RSA public key signature algorithm.</p>
-</div><span id='variant.Sha1' class='variant'><code>Sha1</code></span><div class='docblock'><p>SHA hashing algorithm.</p>
-</div><span id='variant.Sha256' class='variant'><code>Sha256</code></span><div class='docblock'><p>256 bit SHA hashing algorithm.</p>
-</div><span id='variant.Sha384' class='variant'><code>Sha384</code></span><div class='docblock'><p>384 bit SHA hashing algorithm.</p>
-</div><span id='variant.Sha512' class='variant'><code>Sha512</code></span><div class='docblock'><p>512 bit SHA hashing algorithm.</p>
-</div><span id='variant.TripleDes' class='variant'><code>TripleDes</code></span><div class='docblock'><p>Triple DES encryption algorithm.</p>
-</div><span id='variant.TripleDes112' class='variant'><code>TripleDes112</code></span><div class='docblock'><p>Two-key triple DES encryption with effective key length equal to 112 bits.</p>
-</div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a> for <a class='enum' href='../../schannel/schannel_cred/enum.Algorithm.html' title='schannel::schannel_cred::Algorithm'>Algorithm</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-409' class='srclink' href='../../src/schannel/src/schannel_cred.rs.html#26' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'><h4 id='method.clone' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class='enum' href='../../schannel/schannel_cred/enum.Algorithm.html' title='schannel::schannel_cred::Algorithm'>Algorithm</a></code></h4>
-<div class='docblock'><p>Returns a copy of the value. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone">Read more</a></p>
-</div><h4 id='method.clone_from' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from' class='fnname'>clone_from</a>(&amp;mut self, source: &amp;Self)</code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></h4>
-<div class='docblock'><p>Performs copy-assignment from <code>source</code>. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from">Read more</a></p>
-</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html' title='core::marker::Copy'>Copy</a> for <a class='enum' href='../../schannel/schannel_cred/enum.Algorithm.html' title='schannel::schannel_cred::Algorithm'>Algorithm</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-412' class='srclink' href='../../src/schannel/src/schannel_cred.rs.html#26' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='enum' href='../../schannel/schannel_cred/enum.Algorithm.html' title='schannel::schannel_cred::Algorithm'>Algorithm</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-413' class='srclink' href='../../src/schannel/src/schannel_cred.rs.html#26' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'><h4 id='method.fmt' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
+</div><span id='variant.Des' class='variant'><span id='Des.v' class='invisible'><code>Des</code></span></span><div class='docblock'><p>DES encryption algorithm.</p>
+</div><span id='variant.Desx' class='variant'><span id='Desx.v' class='invisible'><code>Desx</code></span></span><div class='docblock'><p>DESX encryption algorithm.</p>
+</div><span id='variant.DhEphem' class='variant'><span id='DhEphem.v' class='invisible'><code>DhEphem</code></span></span><div class='docblock'><p>Diffie-Hellman ephemeral key exchange algorithm.</p>
+</div><span id='variant.DhSf' class='variant'><span id='DhSf.v' class='invisible'><code>DhSf</code></span></span><div class='docblock'><p>Diffie-Hellman store and forward key exchange algorithm.</p>
+</div><span id='variant.DssSign' class='variant'><span id='DssSign.v' class='invisible'><code>DssSign</code></span></span><div class='docblock'><p>DSA public key signature algorithm.</p>
+</div><span id='variant.Ecdh' class='variant'><span id='Ecdh.v' class='invisible'><code>Ecdh</code></span></span><div class='docblock'><p>Elliptic curve Diffie-Hellman key exchange algorithm.</p>
+</div><span id='variant.Ecdsa' class='variant'><span id='Ecdsa.v' class='invisible'><code>Ecdsa</code></span></span><div class='docblock'><p>Elliptic curve digital signature algorithm.</p>
+</div><span id='variant.HashReplaceOwf' class='variant'><span id='HashReplaceOwf.v' class='invisible'><code>HashReplaceOwf</code></span></span><div class='docblock'><p>One way function hashing algorithm.</p>
+</div><span id='variant.HughesMd5' class='variant'><span id='HughesMd5.v' class='invisible'><code>HughesMd5</code></span></span><div class='docblock'><p>Hughes MD5 hashing algorithm.</p>
+</div><span id='variant.Hmac' class='variant'><span id='Hmac.v' class='invisible'><code>Hmac</code></span></span><div class='docblock'><p>HMAC keyed hash algorithm.</p>
+</div><span id='variant.Mac' class='variant'><span id='Mac.v' class='invisible'><code>Mac</code></span></span><div class='docblock'><p>MAC keyed hash algorithm.</p>
+</div><span id='variant.Md2' class='variant'><span id='Md2.v' class='invisible'><code>Md2</code></span></span><div class='docblock'><p>MD2 hashing algorithm.</p>
+</div><span id='variant.Md4' class='variant'><span id='Md4.v' class='invisible'><code>Md4</code></span></span><div class='docblock'><p>MD4 hashing algorithm.</p>
+</div><span id='variant.Md5' class='variant'><span id='Md5.v' class='invisible'><code>Md5</code></span></span><div class='docblock'><p>MD5 hashing algorithm.</p>
+</div><span id='variant.NoSign' class='variant'><span id='NoSign.v' class='invisible'><code>NoSign</code></span></span><div class='docblock'><p>No signature algorithm..</p>
+</div><span id='variant.Rc2' class='variant'><span id='Rc2.v' class='invisible'><code>Rc2</code></span></span><div class='docblock'><p>RC2 block encryption algorithm.</p>
+</div><span id='variant.Rc4' class='variant'><span id='Rc4.v' class='invisible'><code>Rc4</code></span></span><div class='docblock'><p>RC4 stream encryption algorithm.</p>
+</div><span id='variant.Rc5' class='variant'><span id='Rc5.v' class='invisible'><code>Rc5</code></span></span><div class='docblock'><p>RC5 block encryption algorithm.</p>
+</div><span id='variant.RsaKeyx' class='variant'><span id='RsaKeyx.v' class='invisible'><code>RsaKeyx</code></span></span><div class='docblock'><p>RSA public key exchange algorithm.</p>
+</div><span id='variant.RsaSign' class='variant'><span id='RsaSign.v' class='invisible'><code>RsaSign</code></span></span><div class='docblock'><p>RSA public key signature algorithm.</p>
+</div><span id='variant.Sha1' class='variant'><span id='Sha1.v' class='invisible'><code>Sha1</code></span></span><div class='docblock'><p>SHA hashing algorithm.</p>
+</div><span id='variant.Sha256' class='variant'><span id='Sha256.v' class='invisible'><code>Sha256</code></span></span><div class='docblock'><p>256 bit SHA hashing algorithm.</p>
+</div><span id='variant.Sha384' class='variant'><span id='Sha384.v' class='invisible'><code>Sha384</code></span></span><div class='docblock'><p>384 bit SHA hashing algorithm.</p>
+</div><span id='variant.Sha512' class='variant'><span id='Sha512.v' class='invisible'><code>Sha512</code></span></span><div class='docblock'><p>512 bit SHA hashing algorithm.</p>
+</div><span id='variant.TripleDes' class='variant'><span id='TripleDes.v' class='invisible'><code>TripleDes</code></span></span><div class='docblock'><p>Triple DES encryption algorithm.</p>
+</div><span id='variant.TripleDes112' class='variant'><span id='TripleDes112.v' class='invisible'><code>TripleDes112</code></span></span><div class='docblock'><p>Two-key triple DES encryption with effective key length equal to 112 bits.</p>
+</div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='enum' href='../../schannel/schannel_cred/enum.Algorithm.html' title='schannel::schannel_cred::Algorithm'>Algorithm</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-845' class='srclink' href='../../src/schannel/src/schannel_cred.rs.html#26' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.fmt' class='method'><span id='fmt.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></span></h4>
 <div class='docblock'><p>Formats the value using the given formatter.</p>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html' title='core::marker::Copy'>Copy</a> for <a class='enum' href='../../schannel/schannel_cred/enum.Algorithm.html' title='schannel::schannel_cred::Algorithm'>Algorithm</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-882' class='srclink' href='../../src/schannel/src/schannel_cred.rs.html#26' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a> for <a class='enum' href='../../schannel/schannel_cred/enum.Algorithm.html' title='schannel::schannel_cred::Algorithm'>Algorithm</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-883' class='srclink' href='../../src/schannel/src/schannel_cred.rs.html#26' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.clone' class='method'><span id='clone.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class='enum' href='../../schannel/schannel_cred/enum.Algorithm.html' title='schannel::schannel_cred::Algorithm'>Algorithm</a></code></span></h4>
+<div class='docblock'><p>Returns a copy of the value. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone">Read more</a></p>
+</div><h4 id='method.clone_from' class='method'><span id='clone_from.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from' class='fnname'>clone_from</a>(&amp;mut self, source: &amp;Self)</code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
+<div class='docblock'><p>Performs copy-assignment from <code>source</code>. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from">Read more</a></p>
 </div></div></section>
     <section id='search' class="content hidden"></section>
 
@@ -182,11 +182,9 @@ its key length 64 bits.</p>
     <script>
         window.rootPath = "../../";
         window.currentCrate = "schannel";
-        window.playgroundUrl = "";
     </script>
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
-    
     <script defer src="../../search-index.js"></script>
 </body>
 </html>

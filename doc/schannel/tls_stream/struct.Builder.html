@@ -47,19 +47,17 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-672' class='srclink' href='../../src/schannel/src/tls_stream.rs.html#41-45' title='goto source code'>[src]</a></span></h1>
-<pre class='rust struct'>pub struct Builder {
-    // some fields omitted
-}</pre><div class='docblock'><p>A builder type for <code>TlsStream</code>s.</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl <a class='struct' href='../../schannel/tls_stream/struct.Builder.html' title='schannel::tls_stream::Builder'>Builder</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-676' class='srclink' href='../../src/schannel/src/tls_stream.rs.html#47-152' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>() -&gt; <a class='struct' href='../../schannel/tls_stream/struct.Builder.html' title='schannel::tls_stream::Builder'>Builder</a></code></h4>
+               </span><a id='src-962' class='srclink' href='../../src/schannel/src/tls_stream.rs.html#41-45' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct Builder { /* fields omitted */ }</pre><div class='docblock'><p>A builder type for <code>TlsStream</code>s.</p>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl <a class='struct' href='../../schannel/tls_stream/struct.Builder.html' title='schannel::tls_stream::Builder'>Builder</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-409' class='srclink' href='../../src/schannel/src/tls_stream.rs.html#47-152' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.new' class='method'><span id='new.v' class='invisible'><code>fn <a href='#method.new' class='fnname'>new</a>() -&gt; <a class='struct' href='../../schannel/tls_stream/struct.Builder.html' title='schannel::tls_stream::Builder'>Builder</a></code></span></h4>
 <div class='docblock'><p>Returns a new <code>Builder</code>.</p>
-</div><h4 id='method.domain' class='method'><code>fn <a href='#method.domain' class='fnname'>domain</a>(&amp;mut self, domain: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; &amp;mut <a class='struct' href='../../schannel/tls_stream/struct.Builder.html' title='schannel::tls_stream::Builder'>Builder</a></code></h4>
+</div><h4 id='method.domain' class='method'><span id='domain.v' class='invisible'><code>fn <a href='#method.domain' class='fnname'>domain</a>(&amp;mut self, domain: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; &amp;mut <a class='struct' href='../../schannel/tls_stream/struct.Builder.html' title='schannel::tls_stream::Builder'>Builder</a></code></span></h4>
 <div class='docblock'><p>Sets the domain associated with connections created with this <code>Builder</code>.</p>
 
 <p>The domain will be used for Server Name Indication as well as
 certificate validation.</p>
-</div><h4 id='method.cert_store' class='method'><code>fn <a href='#method.cert_store' class='fnname'>cert_store</a>(&amp;mut self, cert_store: <a class='struct' href='../../schannel/cert_store/struct.CertStore.html' title='schannel::cert_store::CertStore'>CertStore</a>) -&gt; &amp;mut <a class='struct' href='../../schannel/tls_stream/struct.Builder.html' title='schannel::tls_stream::Builder'>Builder</a></code></h4>
+</div><h4 id='method.cert_store' class='method'><span id='cert_store.v' class='invisible'><code>fn <a href='#method.cert_store' class='fnname'>cert_store</a>(&amp;mut self, cert_store: <a class='struct' href='../../schannel/cert_store/struct.CertStore.html' title='schannel::cert_store::CertStore'>CertStore</a>) -&gt; &amp;mut <a class='struct' href='../../schannel/tls_stream/struct.Builder.html' title='schannel::tls_stream::Builder'>Builder</a></code></span></h4>
 <div class='docblock'><p>Specifies a custom certificate store which is later used when validating
 a server&#39;s certificate.</p>
 
@@ -70,7 +68,7 @@ against.</p>
 <p>Note that adding certificates here does <strong>not</strong> mean that they are
 implicitly trusted. Instead certificates must sill be signed by some
 local trusted authority.</p>
-</div><h4 id='method.connect' class='method'><code>fn <a href='#method.connect' class='fnname'>connect</a>&lt;S&gt;(&amp;mut self, cred: <a class='struct' href='../../schannel/schannel_cred/struct.SchannelCred.html' title='schannel::schannel_cred::SchannelCred'>SchannelCred</a>, stream: S) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../../schannel/tls_stream/struct.TlsStream.html' title='schannel::tls_stream::TlsStream'>TlsStream</a>&lt;S&gt;,&nbsp;<a class='enum' href='../../schannel/tls_stream/enum.HandshakeError.html' title='schannel::tls_stream::HandshakeError'>HandshakeError</a>&lt;S&gt;&gt; <span class='where'>where S: <a class='trait' href='https://doc.rust-lang.org/nightly/std/io/trait.Read.html' title='std::io::Read'>Read</a> + <a class='trait' href='https://doc.rust-lang.org/nightly/std/io/trait.Write.html' title='std::io::Write'>Write</a></span></code></h4>
+</div><h4 id='method.connect' class='method'><span id='connect.v' class='invisible'><code>fn <a href='#method.connect' class='fnname'>connect</a>&lt;S&gt;(&amp;mut self,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cred: <a class='struct' href='../../schannel/schannel_cred/struct.SchannelCred.html' title='schannel::schannel_cred::SchannelCred'>SchannelCred</a>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; stream: S)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../../schannel/tls_stream/struct.TlsStream.html' title='schannel::tls_stream::TlsStream'>TlsStream</a>&lt;S&gt;, <a class='enum' href='../../schannel/tls_stream/enum.HandshakeError.html' title='schannel::tls_stream::HandshakeError'>HandshakeError</a>&lt;S&gt;&gt; <span class='where'>where S: <a class='trait' href='https://doc.rust-lang.org/nightly/std/io/trait.Read.html' title='std::io::Read'>Read</a> + <a class='trait' href='https://doc.rust-lang.org/nightly/std/io/trait.Write.html' title='std::io::Write'>Write</a></span></code></span></h4>
 <div class='docblock'><p>Initialize a new TLS session where the stream provided will be
 connecting to a remote TLS server.</p>
 
@@ -79,7 +77,7 @@ will be performed if possible, but if the stream is in nonblocking mode
 then a <code>HandshakeError::Interrupted</code> variant may be returned. This
 type can then be extracted to later call
 <code>MidHandshakeTlsStream::handshake</code> when data becomes available.</p>
-</div><h4 id='method.accept' class='method'><code>fn <a href='#method.accept' class='fnname'>accept</a>&lt;S&gt;(&amp;mut self, cred: <a class='struct' href='../../schannel/schannel_cred/struct.SchannelCred.html' title='schannel::schannel_cred::SchannelCred'>SchannelCred</a>, stream: S) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../../schannel/tls_stream/struct.TlsStream.html' title='schannel::tls_stream::TlsStream'>TlsStream</a>&lt;S&gt;,&nbsp;<a class='enum' href='../../schannel/tls_stream/enum.HandshakeError.html' title='schannel::tls_stream::HandshakeError'>HandshakeError</a>&lt;S&gt;&gt; <span class='where'>where S: <a class='trait' href='https://doc.rust-lang.org/nightly/std/io/trait.Read.html' title='std::io::Read'>Read</a> + <a class='trait' href='https://doc.rust-lang.org/nightly/std/io/trait.Write.html' title='std::io::Write'>Write</a></span></code></h4>
+</div><h4 id='method.accept' class='method'><span id='accept.v' class='invisible'><code>fn <a href='#method.accept' class='fnname'>accept</a>&lt;S&gt;(&amp;mut self,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cred: <a class='struct' href='../../schannel/schannel_cred/struct.SchannelCred.html' title='schannel::schannel_cred::SchannelCred'>SchannelCred</a>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; stream: S)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../../schannel/tls_stream/struct.TlsStream.html' title='schannel::tls_stream::TlsStream'>TlsStream</a>&lt;S&gt;, <a class='enum' href='../../schannel/tls_stream/enum.HandshakeError.html' title='schannel::tls_stream::HandshakeError'>HandshakeError</a>&lt;S&gt;&gt; <span class='where'>where S: <a class='trait' href='https://doc.rust-lang.org/nightly/std/io/trait.Read.html' title='std::io::Read'>Read</a> + <a class='trait' href='https://doc.rust-lang.org/nightly/std/io/trait.Write.html' title='std::io::Write'>Write</a></span></code></span></h4>
 <div class='docblock'><p>Initialize a new TLS session where the stream provided will be
 accepting a connection.</p>
 
@@ -91,12 +89,12 @@ will be performed if possible, but if the stream is in nonblocking mode
 then a <code>HandshakeError::Interrupted</code> variant may be returned. This
 type can then be extracted to later call
 <code>MidHandshakeTlsStream::handshake</code> when data becomes available.</p>
-</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../../schannel/tls_stream/struct.Builder.html' title='schannel::tls_stream::Builder'>Builder</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-662' class='srclink' href='../../src/schannel/src/tls_stream.rs.html#40' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'><h4 id='method.fmt' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
-<div class='docblock'><p>Formats the value using the given formatter.</p>
-</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/default/trait.Default.html' title='core::default::Default'>Default</a> for <a class='struct' href='../../schannel/tls_stream/struct.Builder.html' title='schannel::tls_stream::Builder'>Builder</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-670' class='srclink' href='../../src/schannel/src/tls_stream.rs.html#40' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'><h4 id='method.default' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/default/trait.Default.html#tymethod.default' class='fnname'>default</a>() -&gt; <a class='struct' href='../../schannel/tls_stream/struct.Builder.html' title='schannel::tls_stream::Builder'>Builder</a></code></h4>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/default/trait.Default.html' title='core::default::Default'>Default</a> for <a class='struct' href='../../schannel/tls_stream/struct.Builder.html' title='schannel::tls_stream::Builder'>Builder</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-966' class='srclink' href='../../src/schannel/src/tls_stream.rs.html#40' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.default' class='method'><span id='default.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/default/trait.Default.html#tymethod.default' class='fnname'>default</a>() -&gt; <a class='struct' href='../../schannel/tls_stream/struct.Builder.html' title='schannel::tls_stream::Builder'>Builder</a></code></span></h4>
 <div class='docblock'><p>Returns the &quot;default value&quot; for a type. <a href="https://doc.rust-lang.org/nightly/core/default/trait.Default.html#tymethod.default">Read more</a></p>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../../schannel/tls_stream/struct.Builder.html' title='schannel::tls_stream::Builder'>Builder</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-968' class='srclink' href='../../src/schannel/src/tls_stream.rs.html#40' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.fmt' class='method'><span id='fmt.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></span></h4>
+<div class='docblock'><p>Formats the value using the given formatter.</p>
 </div></div></section>
     <section id='search' class="content hidden"></section>
 
@@ -153,11 +151,9 @@ type can then be extracted to later call
     <script>
         window.rootPath = "../../";
         window.currentCrate = "schannel";
-        window.playgroundUrl = "";
     </script>
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
-    
     <script defer src="../../search-index.js"></script>
 </body>
 </html>

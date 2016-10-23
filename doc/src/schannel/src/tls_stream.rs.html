@@ -1289,7 +1289,7 @@
 
     <span class='kw'>fn</span> <span class='ident'>validate</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>io</span>::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
         <span class='comment'>// If we&#39;re accepting connections then we don&#39;t perform any validation</span>
-        <span class='comment'>// fo the remote certificate, that&#39;s what they&#39;re doing!</span>
+        <span class='comment'>// for the remote certificate, that&#39;s what they&#39;re doing!</span>
         <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>accept</span> {
             <span class='kw'>return</span> <span class='prelude-val'>Ok</span>(())
         }
@@ -1678,11 +1678,9 @@
     <script>
         window.rootPath = "../../../";
         window.currentCrate = "schannel";
-        window.playgroundUrl = "";
     </script>
     <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
-    
     <script defer src="../../../search-index.js"></script>
 </body>
 </html>
