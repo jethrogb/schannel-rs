@@ -9,6 +9,7 @@
 
     <title>schannel::cert_store::Memory - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
     <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../main.css">
     
@@ -43,7 +44,7 @@
     </nav>
 
     <section id='main' class="content struct">
-<h1 class='fqn'><span class='in-band'>Struct <a href='../index.html'>schannel</a>::<wbr><a href='index.html'>cert_store</a>::<wbr><a class='struct' href=''>Memory</a></span><span class='out-of-band'><span id='render-detail'>
+<h1 class='fqn'><span class='in-band'>Struct <a href='../index.html'>schannel</a>::<wbr><a href='index.html'>cert_store</a>::<wbr><a class="struct" href=''>Memory</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
@@ -51,21 +52,21 @@
 <pre class='rust struct'>pub struct Memory(_);</pre><div class='docblock'><p>Representation of an in-memory certificate store.</p>
 
 <p>Internally this contains a <code>CertStore</code> which this type can be converted to.</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl <a class='struct' href='../../schannel/cert_store/struct.Memory.html' title='schannel::cert_store::Memory'>Memory</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/schannel/cert_store.rs.html#352-420' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'><h4 id='method.new' class='method'><span id='new.v' class='invisible'><code>fn <a href='#method.new' class='fnname'>new</a>() -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/std/io/error/type.Result.html' title='std::io::error::Result'>Result</a>&lt;<a class='struct' href='../../schannel/cert_store/struct.Memory.html' title='schannel::cert_store::Memory'>Memory</a>&gt;</code></span></h4>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl <a class="struct" href="../../schannel/cert_store/struct.Memory.html" title="struct schannel::cert_store::Memory">Memory</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/schannel/cert_store.rs.html#352-420' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.new' class="method"><span id='new.v' class='invisible'><code>fn <a href='#method.new' class='fnname'>new</a>() -&gt; <a class="type" href="https://doc.rust-lang.org/nightly/std/io/error/type.Result.html" title="type std::io::error::Result">Result</a>&lt;<a class="struct" href="../../schannel/cert_store/struct.Memory.html" title="struct schannel::cert_store::Memory">Memory</a>&gt;</code></span></h4>
 <div class='docblock'><p>Creates a new in-memory certificate store which certificates and CTLs
 can be added to.</p>
 
 <p>Initially the returned certificate store contains no certificates.</p>
-</div><h4 id='method.add_encoded_certificate' class='method'><span id='add_encoded_certificate.v' class='invisible'><code>fn <a href='#method.add_encoded_certificate' class='fnname'>add_encoded_certificate</a>(&amp;mut self, cert: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/std/io/error/type.Result.html' title='std::io::error::Result'>Result</a>&lt;<a class='struct' href='../../schannel/cert_context/struct.CertContext.html' title='schannel::cert_context::CertContext'>CertContext</a>&gt;</code></span></h4>
+</div><h4 id='method.add_encoded_certificate' class="method"><span id='add_encoded_certificate.v' class='invisible'><code>fn <a href='#method.add_encoded_certificate' class='fnname'>add_encoded_certificate</a>(&amp;mut self, cert: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.slice.html">&amp;[</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.slice.html">]</a>) -&gt; <a class="type" href="https://doc.rust-lang.org/nightly/std/io/error/type.Result.html" title="type std::io::error::Result">Result</a>&lt;<a class="struct" href="../../schannel/cert_context/struct.CertContext.html" title="struct schannel::cert_context::CertContext">CertContext</a>&gt;</code></span></h4>
 <div class='docblock'><p>Adds a new certificate to this memory store.</p>
 
 <p>For example the bytes could be a DER-encoded certificate.</p>
-</div><h4 id='method.add_encoded_ctl' class='method'><span id='add_encoded_ctl.v' class='invisible'><code>fn <a href='#method.add_encoded_ctl' class='fnname'>add_encoded_ctl</a>(&amp;mut self, ctl: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/std/io/error/type.Result.html' title='std::io::error::Result'>Result</a>&lt;CtlContext&gt;</code></span></h4>
+</div><h4 id='method.add_encoded_ctl' class="method"><span id='add_encoded_ctl.v' class='invisible'><code>fn <a href='#method.add_encoded_ctl' class='fnname'>add_encoded_ctl</a>(&amp;mut self, ctl: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.slice.html">&amp;[</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.slice.html">]</a>) -&gt; <a class="type" href="https://doc.rust-lang.org/nightly/std/io/error/type.Result.html" title="type std::io::error::Result">Result</a>&lt;CtlContext&gt;</code></span></h4>
 <div class='docblock'><p>Adds a new CTL to this memory store, in its encoded form.</p>
 
 <p>This can be created through the <code>ctl_context::Builder</code> type.</p>
-</div><h4 id='method.into_store' class='method'><span id='into_store.v' class='invisible'><code>fn <a href='#method.into_store' class='fnname'>into_store</a>(self) -&gt; <a class='struct' href='../../schannel/cert_store/struct.CertStore.html' title='schannel::cert_store::CertStore'>CertStore</a></code></span></h4>
+</div><h4 id='method.into_store' class="method"><span id='into_store.v' class='invisible'><code>fn <a href='#method.into_store' class='fnname'>into_store</a>(self) -&gt; <a class="struct" href="../../schannel/cert_store/struct.CertStore.html" title="struct schannel::cert_store::CertStore">CertStore</a></code></span></h4>
 <div class='docblock'><p>Consumes this memory store, returning the underlying <code>CertStore</code>.</p>
 </div></div></section>
     <section id='search' class="content hidden"></section>

@@ -9,6 +9,7 @@
 
     <title>schannel_cred.rs.html -- source</title>
 
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
     <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../main.css">
     
@@ -303,266 +304,266 @@
 <span id="259">259</span>
 <span id="260">260</span>
 <span id="261">261</span>
-</pre><pre class='rust '>
-<span class='doccomment'>//! Schannel credentials.</span>
-<span class='kw'>use</span> <span class='ident'>winapi</span>;
-<span class='kw'>use</span> <span class='ident'>secur32</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>mem</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>ptr</span>;
+</pre><pre class="rust ">
+<span class="doccomment">//! Schannel credentials.</span>
+<span class="kw">use</span> <span class="ident">winapi</span>;
+<span class="kw">use</span> <span class="ident">secur32</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">mem</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ptr</span>;
 
-<span class='kw'>use</span> <span class='ident'>Inner</span>;
-<span class='kw'>use</span> <span class='ident'>cert_context</span>::<span class='ident'>CertContext</span>;
+<span class="kw">use</span> <span class="ident">Inner</span>;
+<span class="kw">use</span> <span class="ident">cert_context</span>::<span class="ident">CertContext</span>;
 
-<span class='macro'>lazy_static</span><span class='macro'>!</span> {
-    <span class='kw'>static</span> <span class='kw-2'>ref</span> <span class='ident'>UNISP_NAME</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>winapi</span>::<span class='ident'>UNISP_NAME</span>.<span class='ident'>bytes</span>().<span class='ident'>chain</span>(<span class='prelude-val'>Some</span>(<span class='number'>0</span>)).<span class='ident'>collect</span>();
+<span class="macro">lazy_static</span><span class="macro">!</span> {
+    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">UNISP_NAME</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">winapi</span>::<span class="ident">UNISP_NAME</span>.<span class="ident">bytes</span>().<span class="ident">chain</span>(<span class="prelude-val">Some</span>(<span class="number">0</span>)).<span class="ident">collect</span>();
 }
 
-<span class='doccomment'>/// The communication direction that an `SchannelCred` will support.</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Copy</span>, <span class='ident'>Debug</span>, <span class='ident'>Clone</span>, <span class='ident'>PartialEq</span>, <span class='ident'>Eq</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>Direction</span> {
-    <span class='doccomment'>/// Server-side, inbound connections.</span>
-    <span class='ident'>Inbound</span>,
-    <span class='doccomment'>/// Client-side, outbound connections.</span>
-    <span class='ident'>Outbound</span>,
+<span class="doccomment">/// The communication direction that an `SchannelCred` will support.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Direction</span> {
+    <span class="doccomment">/// Server-side, inbound connections.</span>
+    <span class="ident">Inbound</span>,
+    <span class="doccomment">/// Client-side, outbound connections.</span>
+    <span class="ident">Outbound</span>,
 }
 
-<span class='doccomment'>/// Algorithms supported by Schannel.</span>
-<span class='comment'>// https://msdn.microsoft.com/en-us/library/windows/desktop/aa375549(v=vs.85).aspx</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>, <span class='ident'>Copy</span>, <span class='ident'>Clone</span>)]</span>
-<span class='attribute'>#[<span class='ident'>repr</span>(<span class='ident'>u32</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>Algorithm</span> {
-    <span class='doccomment'>/// Advanced Encryption Standard (AES).</span>
-    <span class='ident'>Aes</span> <span class='op'>=</span> <span class='ident'>winapi</span>::<span class='ident'>CALG_AES</span>,
-    <span class='doccomment'>/// 128 bit AES.</span>
-    <span class='ident'>Aes128</span> <span class='op'>=</span> <span class='ident'>winapi</span>::<span class='ident'>CALG_AES_128</span>,
-    <span class='doccomment'>/// 192 bit AES.</span>
-    <span class='ident'>Aes192</span> <span class='op'>=</span> <span class='ident'>winapi</span>::<span class='ident'>CALG_AES_192</span>,
-    <span class='doccomment'>/// 256 bit AES.</span>
-    <span class='ident'>Aes256</span> <span class='op'>=</span> <span class='ident'>winapi</span>::<span class='ident'>CALG_AES_256</span>,
-    <span class='doccomment'>/// Temporary algorithm identifier for handles of Diffie-Hellman–agreed keys.</span>
-    <span class='ident'>AgreedkeyAny</span> <span class='op'>=</span> <span class='ident'>winapi</span>::<span class='ident'>CALG_AGREEDKEY_ANY</span>,
-    <span class='doccomment'>/// An algorithm to create a 40-bit DES key that has parity bits and zeroed key bits to make</span>
-    <span class='doccomment'>/// its key length 64 bits.</span>
-    <span class='ident'>CylinkMek</span> <span class='op'>=</span> <span class='ident'>winapi</span>::<span class='ident'>CALG_CYLINK_MEK</span>,
-    <span class='doccomment'>/// DES encryption algorithm.</span>
-    <span class='ident'>Des</span> <span class='op'>=</span> <span class='ident'>winapi</span>::<span class='ident'>CALG_DES</span>,
-    <span class='doccomment'>/// DESX encryption algorithm.</span>
-    <span class='ident'>Desx</span> <span class='op'>=</span> <span class='ident'>winapi</span>::<span class='ident'>CALG_DESX</span>,
-    <span class='doccomment'>/// Diffie-Hellman ephemeral key exchange algorithm.</span>
-    <span class='ident'>DhEphem</span> <span class='op'>=</span> <span class='ident'>winapi</span>::<span class='ident'>CALG_DH_EPHEM</span>,
-    <span class='doccomment'>/// Diffie-Hellman store and forward key exchange algorithm.</span>
-    <span class='ident'>DhSf</span> <span class='op'>=</span> <span class='ident'>winapi</span>::<span class='ident'>CALG_DH_SF</span>,
-    <span class='doccomment'>/// DSA public key signature algorithm.</span>
-    <span class='ident'>DssSign</span> <span class='op'>=</span> <span class='ident'>winapi</span>::<span class='ident'>CALG_DSS_SIGN</span>,
-    <span class='doccomment'>/// Elliptic curve Diffie-Hellman key exchange algorithm.</span>
-    <span class='ident'>Ecdh</span> <span class='op'>=</span> <span class='ident'>winapi</span>::<span class='ident'>CALG_ECDH</span>,
-    <span class='comment'>// https://github.com/retep998/winapi-rs/issues/287</span>
-    <span class='comment'>// /// Ephemeral elliptic curve Diffie-Hellman key exchange algorithm.</span>
-    <span class='comment'>// EcdhEphem = winapi::CALG_ECDH_EPHEM,</span>
-    <span class='doccomment'>/// Elliptic curve digital signature algorithm.</span>
-    <span class='ident'>Ecdsa</span> <span class='op'>=</span> <span class='ident'>winapi</span>::<span class='ident'>CALG_ECDSA</span>,
-    <span class='doccomment'>/// One way function hashing algorithm.</span>
-    <span class='ident'>HashReplaceOwf</span> <span class='op'>=</span> <span class='ident'>winapi</span>::<span class='ident'>CALG_HASH_REPLACE_OWF</span>,
-    <span class='doccomment'>/// Hughes MD5 hashing algorithm.</span>
-    <span class='ident'>HughesMd5</span> <span class='op'>=</span> <span class='ident'>winapi</span>::<span class='ident'>CALG_HUGHES_MD5</span>,
-    <span class='doccomment'>/// HMAC keyed hash algorithm.</span>
-    <span class='ident'>Hmac</span> <span class='op'>=</span> <span class='ident'>winapi</span>::<span class='ident'>CALG_HMAC</span>,
-    <span class='doccomment'>/// MAC keyed hash algorithm.</span>
-    <span class='ident'>Mac</span> <span class='op'>=</span> <span class='ident'>winapi</span>::<span class='ident'>CALG_MAC</span>,
-    <span class='doccomment'>/// MD2 hashing algorithm.</span>
-    <span class='ident'>Md2</span> <span class='op'>=</span> <span class='ident'>winapi</span>::<span class='ident'>CALG_MD2</span>,
-    <span class='doccomment'>/// MD4 hashing algorithm.</span>
-    <span class='ident'>Md4</span> <span class='op'>=</span> <span class='ident'>winapi</span>::<span class='ident'>CALG_MD4</span>,
-    <span class='doccomment'>/// MD5 hashing algorithm.</span>
-    <span class='ident'>Md5</span> <span class='op'>=</span> <span class='ident'>winapi</span>::<span class='ident'>CALG_MD5</span>,
-    <span class='doccomment'>/// No signature algorithm..</span>
-    <span class='ident'>NoSign</span> <span class='op'>=</span> <span class='ident'>winapi</span>::<span class='ident'>CALG_NO_SIGN</span>,
-    <span class='doccomment'>/// RC2 block encryption algorithm.</span>
-    <span class='ident'>Rc2</span> <span class='op'>=</span> <span class='ident'>winapi</span>::<span class='ident'>CALG_RC2</span>,
-    <span class='doccomment'>/// RC4 stream encryption algorithm.</span>
-    <span class='ident'>Rc4</span> <span class='op'>=</span> <span class='ident'>winapi</span>::<span class='ident'>CALG_RC4</span>,
-    <span class='doccomment'>/// RC5 block encryption algorithm.</span>
-    <span class='ident'>Rc5</span> <span class='op'>=</span> <span class='ident'>winapi</span>::<span class='ident'>CALG_RC5</span>,
-    <span class='doccomment'>/// RSA public key exchange algorithm.</span>
-    <span class='ident'>RsaKeyx</span> <span class='op'>=</span> <span class='ident'>winapi</span>::<span class='ident'>CALG_RSA_KEYX</span>,
-    <span class='doccomment'>/// RSA public key signature algorithm.</span>
-    <span class='ident'>RsaSign</span> <span class='op'>=</span> <span class='ident'>winapi</span>::<span class='ident'>CALG_RSA_SIGN</span>,
-    <span class='doccomment'>/// SHA hashing algorithm.</span>
-    <span class='ident'>Sha1</span> <span class='op'>=</span> <span class='ident'>winapi</span>::<span class='ident'>CALG_SHA1</span>,
-    <span class='doccomment'>/// 256 bit SHA hashing algorithm.</span>
-    <span class='ident'>Sha256</span> <span class='op'>=</span> <span class='ident'>winapi</span>::<span class='ident'>CALG_SHA_256</span>,
-    <span class='doccomment'>/// 384 bit SHA hashing algorithm.</span>
-    <span class='ident'>Sha384</span> <span class='op'>=</span> <span class='ident'>winapi</span>::<span class='ident'>CALG_SHA_384</span>,
-    <span class='doccomment'>/// 512 bit SHA hashing algorithm.</span>
-    <span class='ident'>Sha512</span> <span class='op'>=</span> <span class='ident'>winapi</span>::<span class='ident'>CALG_SHA_512</span>,
-    <span class='doccomment'>/// Triple DES encryption algorithm.</span>
-    <span class='ident'>TripleDes</span> <span class='op'>=</span> <span class='ident'>winapi</span>::<span class='ident'>CALG_3DES</span>,
-    <span class='doccomment'>/// Two-key triple DES encryption with effective key length equal to 112 bits.</span>
-    <span class='ident'>TripleDes112</span> <span class='op'>=</span> <span class='ident'>winapi</span>::<span class='ident'>CALG_3DES_112</span>,
-    <span class='attribute'>#[<span class='ident'>doc</span>(<span class='ident'>hidden</span>)]</span>
-    <span class='ident'>__ForExtensibility</span>,
+<span class="doccomment">/// Algorithms supported by Schannel.</span>
+<span class="comment">// https://msdn.microsoft.com/en-us/library/windows/desktop/aa375549(v=vs.85).aspx</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Algorithm</span> {
+    <span class="doccomment">/// Advanced Encryption Standard (AES).</span>
+    <span class="ident">Aes</span> <span class="op">=</span> <span class="ident">winapi</span>::<span class="ident">CALG_AES</span>,
+    <span class="doccomment">/// 128 bit AES.</span>
+    <span class="ident">Aes128</span> <span class="op">=</span> <span class="ident">winapi</span>::<span class="ident">CALG_AES_128</span>,
+    <span class="doccomment">/// 192 bit AES.</span>
+    <span class="ident">Aes192</span> <span class="op">=</span> <span class="ident">winapi</span>::<span class="ident">CALG_AES_192</span>,
+    <span class="doccomment">/// 256 bit AES.</span>
+    <span class="ident">Aes256</span> <span class="op">=</span> <span class="ident">winapi</span>::<span class="ident">CALG_AES_256</span>,
+    <span class="doccomment">/// Temporary algorithm identifier for handles of Diffie-Hellman–agreed keys.</span>
+    <span class="ident">AgreedkeyAny</span> <span class="op">=</span> <span class="ident">winapi</span>::<span class="ident">CALG_AGREEDKEY_ANY</span>,
+    <span class="doccomment">/// An algorithm to create a 40-bit DES key that has parity bits and zeroed key bits to make</span>
+    <span class="doccomment">/// its key length 64 bits.</span>
+    <span class="ident">CylinkMek</span> <span class="op">=</span> <span class="ident">winapi</span>::<span class="ident">CALG_CYLINK_MEK</span>,
+    <span class="doccomment">/// DES encryption algorithm.</span>
+    <span class="ident">Des</span> <span class="op">=</span> <span class="ident">winapi</span>::<span class="ident">CALG_DES</span>,
+    <span class="doccomment">/// DESX encryption algorithm.</span>
+    <span class="ident">Desx</span> <span class="op">=</span> <span class="ident">winapi</span>::<span class="ident">CALG_DESX</span>,
+    <span class="doccomment">/// Diffie-Hellman ephemeral key exchange algorithm.</span>
+    <span class="ident">DhEphem</span> <span class="op">=</span> <span class="ident">winapi</span>::<span class="ident">CALG_DH_EPHEM</span>,
+    <span class="doccomment">/// Diffie-Hellman store and forward key exchange algorithm.</span>
+    <span class="ident">DhSf</span> <span class="op">=</span> <span class="ident">winapi</span>::<span class="ident">CALG_DH_SF</span>,
+    <span class="doccomment">/// DSA public key signature algorithm.</span>
+    <span class="ident">DssSign</span> <span class="op">=</span> <span class="ident">winapi</span>::<span class="ident">CALG_DSS_SIGN</span>,
+    <span class="doccomment">/// Elliptic curve Diffie-Hellman key exchange algorithm.</span>
+    <span class="ident">Ecdh</span> <span class="op">=</span> <span class="ident">winapi</span>::<span class="ident">CALG_ECDH</span>,
+    <span class="comment">// https://github.com/retep998/winapi-rs/issues/287</span>
+    <span class="comment">// /// Ephemeral elliptic curve Diffie-Hellman key exchange algorithm.</span>
+    <span class="comment">// EcdhEphem = winapi::CALG_ECDH_EPHEM,</span>
+    <span class="doccomment">/// Elliptic curve digital signature algorithm.</span>
+    <span class="ident">Ecdsa</span> <span class="op">=</span> <span class="ident">winapi</span>::<span class="ident">CALG_ECDSA</span>,
+    <span class="doccomment">/// One way function hashing algorithm.</span>
+    <span class="ident">HashReplaceOwf</span> <span class="op">=</span> <span class="ident">winapi</span>::<span class="ident">CALG_HASH_REPLACE_OWF</span>,
+    <span class="doccomment">/// Hughes MD5 hashing algorithm.</span>
+    <span class="ident">HughesMd5</span> <span class="op">=</span> <span class="ident">winapi</span>::<span class="ident">CALG_HUGHES_MD5</span>,
+    <span class="doccomment">/// HMAC keyed hash algorithm.</span>
+    <span class="ident">Hmac</span> <span class="op">=</span> <span class="ident">winapi</span>::<span class="ident">CALG_HMAC</span>,
+    <span class="doccomment">/// MAC keyed hash algorithm.</span>
+    <span class="ident">Mac</span> <span class="op">=</span> <span class="ident">winapi</span>::<span class="ident">CALG_MAC</span>,
+    <span class="doccomment">/// MD2 hashing algorithm.</span>
+    <span class="ident">Md2</span> <span class="op">=</span> <span class="ident">winapi</span>::<span class="ident">CALG_MD2</span>,
+    <span class="doccomment">/// MD4 hashing algorithm.</span>
+    <span class="ident">Md4</span> <span class="op">=</span> <span class="ident">winapi</span>::<span class="ident">CALG_MD4</span>,
+    <span class="doccomment">/// MD5 hashing algorithm.</span>
+    <span class="ident">Md5</span> <span class="op">=</span> <span class="ident">winapi</span>::<span class="ident">CALG_MD5</span>,
+    <span class="doccomment">/// No signature algorithm..</span>
+    <span class="ident">NoSign</span> <span class="op">=</span> <span class="ident">winapi</span>::<span class="ident">CALG_NO_SIGN</span>,
+    <span class="doccomment">/// RC2 block encryption algorithm.</span>
+    <span class="ident">Rc2</span> <span class="op">=</span> <span class="ident">winapi</span>::<span class="ident">CALG_RC2</span>,
+    <span class="doccomment">/// RC4 stream encryption algorithm.</span>
+    <span class="ident">Rc4</span> <span class="op">=</span> <span class="ident">winapi</span>::<span class="ident">CALG_RC4</span>,
+    <span class="doccomment">/// RC5 block encryption algorithm.</span>
+    <span class="ident">Rc5</span> <span class="op">=</span> <span class="ident">winapi</span>::<span class="ident">CALG_RC5</span>,
+    <span class="doccomment">/// RSA public key exchange algorithm.</span>
+    <span class="ident">RsaKeyx</span> <span class="op">=</span> <span class="ident">winapi</span>::<span class="ident">CALG_RSA_KEYX</span>,
+    <span class="doccomment">/// RSA public key signature algorithm.</span>
+    <span class="ident">RsaSign</span> <span class="op">=</span> <span class="ident">winapi</span>::<span class="ident">CALG_RSA_SIGN</span>,
+    <span class="doccomment">/// SHA hashing algorithm.</span>
+    <span class="ident">Sha1</span> <span class="op">=</span> <span class="ident">winapi</span>::<span class="ident">CALG_SHA1</span>,
+    <span class="doccomment">/// 256 bit SHA hashing algorithm.</span>
+    <span class="ident">Sha256</span> <span class="op">=</span> <span class="ident">winapi</span>::<span class="ident">CALG_SHA_256</span>,
+    <span class="doccomment">/// 384 bit SHA hashing algorithm.</span>
+    <span class="ident">Sha384</span> <span class="op">=</span> <span class="ident">winapi</span>::<span class="ident">CALG_SHA_384</span>,
+    <span class="doccomment">/// 512 bit SHA hashing algorithm.</span>
+    <span class="ident">Sha512</span> <span class="op">=</span> <span class="ident">winapi</span>::<span class="ident">CALG_SHA_512</span>,
+    <span class="doccomment">/// Triple DES encryption algorithm.</span>
+    <span class="ident">TripleDes</span> <span class="op">=</span> <span class="ident">winapi</span>::<span class="ident">CALG_3DES</span>,
+    <span class="doccomment">/// Two-key triple DES encryption with effective key length equal to 112 bits.</span>
+    <span class="ident">TripleDes112</span> <span class="op">=</span> <span class="ident">winapi</span>::<span class="ident">CALG_3DES_112</span>,
+    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+    <span class="ident">__ForExtensibility</span>,
 }
 
-<span class='doccomment'>/// Protocols supported by Schannel.</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>, <span class='ident'>Copy</span>, <span class='ident'>Clone</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>Protocol</span> {
-    <span class='doccomment'>/// Secure Sockets Layer 3.0</span>
-    <span class='ident'>Ssl3</span>,
-    <span class='doccomment'>/// Transport Layer Security 1.0</span>
-    <span class='ident'>Tls10</span>,
-    <span class='doccomment'>/// Transport Layer Security 1.1</span>
-    <span class='ident'>Tls11</span>,
-    <span class='doccomment'>/// Transport Layer Security 1.2</span>
-    <span class='ident'>Tls12</span>,
-    <span class='attribute'>#[<span class='ident'>doc</span>(<span class='ident'>hidden</span>)]</span>
-    <span class='ident'>__ForExtensibility</span>,
+<span class="doccomment">/// Protocols supported by Schannel.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Protocol</span> {
+    <span class="doccomment">/// Secure Sockets Layer 3.0</span>
+    <span class="ident">Ssl3</span>,
+    <span class="doccomment">/// Transport Layer Security 1.0</span>
+    <span class="ident">Tls10</span>,
+    <span class="doccomment">/// Transport Layer Security 1.1</span>
+    <span class="ident">Tls11</span>,
+    <span class="doccomment">/// Transport Layer Security 1.2</span>
+    <span class="ident">Tls12</span>,
+    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+    <span class="ident">__ForExtensibility</span>,
 }
 
-<span class='kw'>impl</span> <span class='ident'>Protocol</span> {
-    <span class='kw'>fn</span> <span class='ident'>dword</span>(<span class='self'>self</span>, <span class='ident'>direction</span>: <span class='ident'>Direction</span>) <span class='op'>-&gt;</span> <span class='ident'>winapi</span>::<span class='ident'>DWORD</span> {
-        <span class='kw'>match</span> (<span class='self'>self</span>, <span class='ident'>direction</span>) {
-            (<span class='ident'>Protocol</span>::<span class='ident'>Ssl3</span>, <span class='ident'>Direction</span>::<span class='ident'>Inbound</span>) <span class='op'>=&gt;</span> <span class='ident'>winapi</span>::<span class='ident'>SP_PROT_SSL3_SERVER</span>,
-            (<span class='ident'>Protocol</span>::<span class='ident'>Tls10</span>, <span class='ident'>Direction</span>::<span class='ident'>Inbound</span>) <span class='op'>=&gt;</span> <span class='ident'>winapi</span>::<span class='ident'>SP_PROT_TLS1_0_SERVER</span>,
-            (<span class='ident'>Protocol</span>::<span class='ident'>Tls11</span>, <span class='ident'>Direction</span>::<span class='ident'>Inbound</span>) <span class='op'>=&gt;</span> <span class='ident'>winapi</span>::<span class='ident'>SP_PROT_TLS1_1_SERVER</span>,
-            (<span class='ident'>Protocol</span>::<span class='ident'>Tls12</span>, <span class='ident'>Direction</span>::<span class='ident'>Inbound</span>) <span class='op'>=&gt;</span> <span class='ident'>winapi</span>::<span class='ident'>SP_PROT_TLS1_2_SERVER</span>,
-            (<span class='ident'>Protocol</span>::<span class='ident'>Ssl3</span>, <span class='ident'>Direction</span>::<span class='ident'>Outbound</span>) <span class='op'>=&gt;</span> <span class='ident'>winapi</span>::<span class='ident'>SP_PROT_SSL3_CLIENT</span>,
-            (<span class='ident'>Protocol</span>::<span class='ident'>Tls10</span>, <span class='ident'>Direction</span>::<span class='ident'>Outbound</span>) <span class='op'>=&gt;</span> <span class='ident'>winapi</span>::<span class='ident'>SP_PROT_TLS1_0_CLIENT</span>,
-            (<span class='ident'>Protocol</span>::<span class='ident'>Tls11</span>, <span class='ident'>Direction</span>::<span class='ident'>Outbound</span>) <span class='op'>=&gt;</span> <span class='ident'>winapi</span>::<span class='ident'>SP_PROT_TLS1_1_CLIENT</span>,
-            (<span class='ident'>Protocol</span>::<span class='ident'>Tls12</span>, <span class='ident'>Direction</span>::<span class='ident'>Outbound</span>) <span class='op'>=&gt;</span> <span class='ident'>winapi</span>::<span class='ident'>SP_PROT_TLS1_2_CLIENT</span>,
-            (<span class='ident'>Protocol</span>::<span class='ident'>__ForExtensibility</span>, _) <span class='op'>=&gt;</span> <span class='macro'>unreachable</span><span class='macro'>!</span>(),
+<span class="kw">impl</span> <span class="ident">Protocol</span> {
+    <span class="kw">fn</span> <span class="ident">dword</span>(<span class="self">self</span>, <span class="ident">direction</span>: <span class="ident">Direction</span>) <span class="op">-&gt;</span> <span class="ident">winapi</span>::<span class="ident">DWORD</span> {
+        <span class="kw">match</span> (<span class="self">self</span>, <span class="ident">direction</span>) {
+            (<span class="ident">Protocol</span>::<span class="ident">Ssl3</span>, <span class="ident">Direction</span>::<span class="ident">Inbound</span>) <span class="op">=&gt;</span> <span class="ident">winapi</span>::<span class="ident">SP_PROT_SSL3_SERVER</span>,
+            (<span class="ident">Protocol</span>::<span class="ident">Tls10</span>, <span class="ident">Direction</span>::<span class="ident">Inbound</span>) <span class="op">=&gt;</span> <span class="ident">winapi</span>::<span class="ident">SP_PROT_TLS1_0_SERVER</span>,
+            (<span class="ident">Protocol</span>::<span class="ident">Tls11</span>, <span class="ident">Direction</span>::<span class="ident">Inbound</span>) <span class="op">=&gt;</span> <span class="ident">winapi</span>::<span class="ident">SP_PROT_TLS1_1_SERVER</span>,
+            (<span class="ident">Protocol</span>::<span class="ident">Tls12</span>, <span class="ident">Direction</span>::<span class="ident">Inbound</span>) <span class="op">=&gt;</span> <span class="ident">winapi</span>::<span class="ident">SP_PROT_TLS1_2_SERVER</span>,
+            (<span class="ident">Protocol</span>::<span class="ident">Ssl3</span>, <span class="ident">Direction</span>::<span class="ident">Outbound</span>) <span class="op">=&gt;</span> <span class="ident">winapi</span>::<span class="ident">SP_PROT_SSL3_CLIENT</span>,
+            (<span class="ident">Protocol</span>::<span class="ident">Tls10</span>, <span class="ident">Direction</span>::<span class="ident">Outbound</span>) <span class="op">=&gt;</span> <span class="ident">winapi</span>::<span class="ident">SP_PROT_TLS1_0_CLIENT</span>,
+            (<span class="ident">Protocol</span>::<span class="ident">Tls11</span>, <span class="ident">Direction</span>::<span class="ident">Outbound</span>) <span class="op">=&gt;</span> <span class="ident">winapi</span>::<span class="ident">SP_PROT_TLS1_1_CLIENT</span>,
+            (<span class="ident">Protocol</span>::<span class="ident">Tls12</span>, <span class="ident">Direction</span>::<span class="ident">Outbound</span>) <span class="op">=&gt;</span> <span class="ident">winapi</span>::<span class="ident">SP_PROT_TLS1_2_CLIENT</span>,
+            (<span class="ident">Protocol</span>::<span class="ident">__ForExtensibility</span>, _) <span class="op">=&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>(),
         }
     }
 }
 
-<span class='doccomment'>/// A builder type for `SchannelCred`s.</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Default</span>, <span class='ident'>Debug</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Builder</span> {
-    <span class='ident'>supported_algorithms</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Algorithm</span><span class='op'>&gt;&gt;</span>,
-    <span class='ident'>enabled_protocols</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Protocol</span><span class='op'>&gt;&gt;</span>,
-    <span class='ident'>certs</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>CertContext</span><span class='op'>&gt;</span>,
+<span class="doccomment">/// A builder type for `SchannelCred`s.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Builder</span> {
+    <span class="ident">supported_algorithms</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Algorithm</span><span class="op">&gt;&gt;</span>,
+    <span class="ident">enabled_protocols</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Protocol</span><span class="op">&gt;&gt;</span>,
+    <span class="ident">certs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CertContext</span><span class="op">&gt;</span>,
 }
 
-<span class='kw'>impl</span> <span class='ident'>Builder</span> {
-    <span class='doccomment'>/// Returns a new `Builder`.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>() <span class='op'>-&gt;</span> <span class='ident'>Builder</span> {
-        <span class='ident'>Builder</span>::<span class='ident'>default</span>()
+<span class="kw">impl</span> <span class="ident">Builder</span> {
+    <span class="doccomment">/// Returns a new `Builder`.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-&gt;</span> <span class="ident">Builder</span> {
+        <span class="ident">Builder</span>::<span class="ident">default</span>()
     }
 
-    <span class='doccomment'>/// Sets the algorithms supported for credentials created from this builder.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>supported_algorithms</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>,
-                                <span class='ident'>supported_algorithms</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>Algorithm</span>])
-                                <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span> {
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>supported_algorithms</span>.<span class='ident'>iter</span>()
-            .<span class='ident'>all</span>(<span class='op'>|</span><span class='ident'>a</span><span class='op'>|</span> {
-                <span class='kw'>match</span> <span class='op'>*</span><span class='ident'>a</span> {
-                    <span class='ident'>Algorithm</span>::<span class='ident'>__ForExtensibility</span> <span class='op'>=&gt;</span> <span class='bool-val'>false</span>,
-                    _ <span class='op'>=&gt;</span> <span class='bool-val'>true</span>,
+    <span class="doccomment">/// Sets the algorithms supported for credentials created from this builder.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">supported_algorithms</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+                                <span class="ident">supported_algorithms</span>: <span class="kw-2">&amp;</span>[<span class="ident">Algorithm</span>])
+                                <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Builder</span> {
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">supported_algorithms</span>.<span class="ident">iter</span>()
+            .<span class="ident">all</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> {
+                <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">a</span> {
+                    <span class="ident">Algorithm</span>::<span class="ident">__ForExtensibility</span> <span class="op">=&gt;</span> <span class="bool-val">false</span>,
+                    _ <span class="op">=&gt;</span> <span class="bool-val">true</span>,
                 }
             }));
-        <span class='self'>self</span>.<span class='ident'>supported_algorithms</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>supported_algorithms</span>.<span class='ident'>to_owned</span>());
-        <span class='self'>self</span>
+        <span class="self">self</span>.<span class="ident">supported_algorithms</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">supported_algorithms</span>.<span class="ident">to_owned</span>());
+        <span class="self">self</span>
     }
 
-    <span class='doccomment'>/// Sets the protocols enabled for credentials created from this builder.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>enabled_protocols</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>,
-                             <span class='ident'>enabled_protocols</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>Protocol</span>])
-                             <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span> {
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>enabled_protocols</span>.<span class='ident'>iter</span>()
-            .<span class='ident'>all</span>(<span class='op'>|</span><span class='ident'>a</span><span class='op'>|</span> {
-                <span class='kw'>match</span> <span class='op'>*</span><span class='ident'>a</span> {
-                    <span class='ident'>Protocol</span>::<span class='ident'>__ForExtensibility</span> <span class='op'>=&gt;</span> <span class='bool-val'>false</span>,
-                    _ <span class='op'>=&gt;</span> <span class='bool-val'>true</span>,
+    <span class="doccomment">/// Sets the protocols enabled for credentials created from this builder.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enabled_protocols</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+                             <span class="ident">enabled_protocols</span>: <span class="kw-2">&amp;</span>[<span class="ident">Protocol</span>])
+                             <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Builder</span> {
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">enabled_protocols</span>.<span class="ident">iter</span>()
+            .<span class="ident">all</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> {
+                <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">a</span> {
+                    <span class="ident">Protocol</span>::<span class="ident">__ForExtensibility</span> <span class="op">=&gt;</span> <span class="bool-val">false</span>,
+                    _ <span class="op">=&gt;</span> <span class="bool-val">true</span>,
                 }
             }));
-        <span class='self'>self</span>.<span class='ident'>enabled_protocols</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>enabled_protocols</span>.<span class='ident'>to_owned</span>());
-        <span class='self'>self</span>
+        <span class="self">self</span>.<span class="ident">enabled_protocols</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">enabled_protocols</span>.<span class="ident">to_owned</span>());
+        <span class="self">self</span>
     }
 
-    <span class='doccomment'>/// Add a certificate to get passed down when the credentials are acquired.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// Certificates passed here may specify a certificate that contains a</span>
-    <span class='doccomment'>/// private key to be used in authenticating the application. Typically,</span>
-    <span class='doccomment'>/// this is called once for each key exchange method supported by</span>
-    <span class='doccomment'>/// servers.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// Clients often do not call this function and either depend on Schannel to</span>
-    <span class='doccomment'>/// find an appropriate certificate or create a certificate later if needed.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>cert</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>cx</span>: <span class='ident'>CertContext</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Builder</span> {
-        <span class='self'>self</span>.<span class='ident'>certs</span>.<span class='ident'>push</span>(<span class='ident'>cx</span>);
-        <span class='self'>self</span>
+    <span class="doccomment">/// Add a certificate to get passed down when the credentials are acquired.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Certificates passed here may specify a certificate that contains a</span>
+    <span class="doccomment">/// private key to be used in authenticating the application. Typically,</span>
+    <span class="doccomment">/// this is called once for each key exchange method supported by</span>
+    <span class="doccomment">/// servers.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Clients often do not call this function and either depend on Schannel to</span>
+    <span class="doccomment">/// find an appropriate certificate or create a certificate later if needed.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cert</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="ident">CertContext</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Builder</span> {
+        <span class="self">self</span>.<span class="ident">certs</span>.<span class="ident">push</span>(<span class="ident">cx</span>);
+        <span class="self">self</span>
     }
 
-    <span class='doccomment'>/// Creates a new `SchannelCred`.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>acquire</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>direction</span>: <span class='ident'>Direction</span>) <span class='op'>-&gt;</span> <span class='ident'>io</span>::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>SchannelCred</span><span class='op'>&gt;</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>handle</span> <span class='op'>=</span> <span class='ident'>mem</span>::<span class='ident'>zeroed</span>();
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>cred_data</span>: <span class='ident'>winapi</span>::<span class='ident'>SCHANNEL_CRED</span> <span class='op'>=</span> <span class='ident'>mem</span>::<span class='ident'>zeroed</span>();
-            <span class='ident'>cred_data</span>.<span class='ident'>dwVersion</span> <span class='op'>=</span> <span class='ident'>winapi</span>::<span class='ident'>SCHANNEL_CRED_VERSION</span>;
-            <span class='ident'>cred_data</span>.<span class='ident'>dwFlags</span> <span class='op'>=</span> <span class='ident'>winapi</span>::<span class='ident'>SCH_USE_STRONG_CRYPTO</span>;
-            <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='ident'>supported_algorithms</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>supported_algorithms</span> {
-                <span class='ident'>cred_data</span>.<span class='ident'>cSupportedAlgs</span> <span class='op'>=</span> <span class='ident'>supported_algorithms</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>winapi</span>::<span class='ident'>DWORD</span>;
-                <span class='ident'>cred_data</span>.<span class='ident'>palgSupportedAlgs</span> <span class='op'>=</span> <span class='ident'>supported_algorithms</span>.<span class='ident'>as_ptr</span>() <span class='kw'>as</span> <span class='op'>*</span><span class='kw-2'>mut</span> _;
+    <span class="doccomment">/// Creates a new `SchannelCred`.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">acquire</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">direction</span>: <span class="ident">Direction</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SchannelCred</span><span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">mem</span>::<span class="ident">zeroed</span>();
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cred_data</span>: <span class="ident">winapi</span>::<span class="ident">SCHANNEL_CRED</span> <span class="op">=</span> <span class="ident">mem</span>::<span class="ident">zeroed</span>();
+            <span class="ident">cred_data</span>.<span class="ident">dwVersion</span> <span class="op">=</span> <span class="ident">winapi</span>::<span class="ident">SCHANNEL_CRED_VERSION</span>;
+            <span class="ident">cred_data</span>.<span class="ident">dwFlags</span> <span class="op">=</span> <span class="ident">winapi</span>::<span class="ident">SCH_USE_STRONG_CRYPTO</span>;
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">supported_algorithms</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">supported_algorithms</span> {
+                <span class="ident">cred_data</span>.<span class="ident">cSupportedAlgs</span> <span class="op">=</span> <span class="ident">supported_algorithms</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">winapi</span>::<span class="ident">DWORD</span>;
+                <span class="ident">cred_data</span>.<span class="ident">palgSupportedAlgs</span> <span class="op">=</span> <span class="ident">supported_algorithms</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> _;
             }
-            <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='ident'>enabled_protocols</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>enabled_protocols</span> {
-                <span class='ident'>cred_data</span>.<span class='ident'>grbitEnabledProtocols</span> <span class='op'>=</span> <span class='ident'>enabled_protocols</span>.<span class='ident'>iter</span>()
-                    .<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>p</span><span class='op'>|</span> <span class='ident'>p</span>.<span class='ident'>dword</span>(<span class='ident'>direction</span>))
-                    .<span class='ident'>fold</span>(<span class='number'>0</span>, <span class='op'>|</span><span class='ident'>acc</span>, <span class='ident'>p</span><span class='op'>|</span> <span class='ident'>acc</span> <span class='op'>|</span> <span class='ident'>p</span>);
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">enabled_protocols</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">enabled_protocols</span> {
+                <span class="ident">cred_data</span>.<span class="ident">grbitEnabledProtocols</span> <span class="op">=</span> <span class="ident">enabled_protocols</span>.<span class="ident">iter</span>()
+                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">dword</span>(<span class="ident">direction</span>))
+                    .<span class="ident">fold</span>(<span class="number">0</span>, <span class="op">|</span><span class="ident">acc</span>, <span class="ident">p</span><span class="op">|</span> <span class="ident">acc</span> <span class="op">|</span> <span class="ident">p</span>);
             }
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>certs</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>certs</span>.<span class='ident'>iter</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>c</span><span class='op'>|</span> <span class='ident'>c</span>.<span class='ident'>as_inner</span>()).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span>_<span class='op'>&gt;&gt;</span>();
-            <span class='ident'>cred_data</span>.<span class='ident'>cCreds</span> <span class='op'>=</span> <span class='ident'>certs</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>winapi</span>::<span class='ident'>DWORD</span>;
-            <span class='ident'>cred_data</span>.<span class='ident'>paCred</span> <span class='op'>=</span> <span class='ident'>certs</span>.<span class='ident'>as_mut_ptr</span>();
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">certs</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">certs</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">as_inner</span>()).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>_<span class="op">&gt;&gt;</span>();
+            <span class="ident">cred_data</span>.<span class="ident">cCreds</span> <span class="op">=</span> <span class="ident">certs</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">winapi</span>::<span class="ident">DWORD</span>;
+            <span class="ident">cred_data</span>.<span class="ident">paCred</span> <span class="op">=</span> <span class="ident">certs</span>.<span class="ident">as_mut_ptr</span>();
 
-            <span class='kw'>let</span> <span class='ident'>direction</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>direction</span> {
-                <span class='ident'>Direction</span>::<span class='ident'>Inbound</span> <span class='op'>=&gt;</span> <span class='ident'>winapi</span>::<span class='ident'>SECPKG_CRED_INBOUND</span>,
-                <span class='ident'>Direction</span>::<span class='ident'>Outbound</span> <span class='op'>=&gt;</span> <span class='ident'>winapi</span>::<span class='ident'>SECPKG_CRED_OUTBOUND</span>,
+            <span class="kw">let</span> <span class="ident">direction</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">direction</span> {
+                <span class="ident">Direction</span>::<span class="ident">Inbound</span> <span class="op">=&gt;</span> <span class="ident">winapi</span>::<span class="ident">SECPKG_CRED_INBOUND</span>,
+                <span class="ident">Direction</span>::<span class="ident">Outbound</span> <span class="op">=&gt;</span> <span class="ident">winapi</span>::<span class="ident">SECPKG_CRED_OUTBOUND</span>,
             };
 
-            <span class='kw'>match</span> <span class='ident'>secur32</span>::<span class='ident'>AcquireCredentialsHandleA</span>(<span class='ident'>ptr</span>::<span class='ident'>null_mut</span>(),
-                                                     <span class='ident'>UNISP_NAME</span>.<span class='ident'>as_ptr</span>() <span class='kw'>as</span> <span class='op'>*</span><span class='kw'>const</span> _ <span class='kw'>as</span> <span class='op'>*</span><span class='kw-2'>mut</span> _,
-                                                     <span class='ident'>direction</span>,
-                                                     <span class='ident'>ptr</span>::<span class='ident'>null_mut</span>(),
-                                                     <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>cred_data</span> <span class='kw'>as</span> <span class='op'>*</span><span class='kw-2'>mut</span> _ <span class='kw'>as</span> <span class='op'>*</span><span class='kw-2'>mut</span> _,
-                                                     <span class='prelude-val'>None</span>,
-                                                     <span class='ident'>ptr</span>::<span class='ident'>null_mut</span>(),
-                                                     <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>handle</span>,
-                                                     <span class='ident'>ptr</span>::<span class='ident'>null_mut</span>()) {
-                <span class='ident'>winapi</span>::<span class='ident'>SEC_E_OK</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Ok</span>(<span class='ident'>SchannelCred</span>(<span class='ident'>handle</span>)),
-                <span class='ident'>err</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Err</span>(<span class='ident'>io</span>::<span class='ident'>Error</span>::<span class='ident'>from_raw_os_error</span>(<span class='ident'>err</span> <span class='kw'>as</span> <span class='ident'>i32</span>)),
+            <span class="kw">match</span> <span class="ident">secur32</span>::<span class="ident">AcquireCredentialsHandleA</span>(<span class="ident">ptr</span>::<span class="ident">null_mut</span>(),
+                                                     <span class="ident">UNISP_NAME</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> _ <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> _,
+                                                     <span class="ident">direction</span>,
+                                                     <span class="ident">ptr</span>::<span class="ident">null_mut</span>(),
+                                                     <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cred_data</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> _ <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> _,
+                                                     <span class="prelude-val">None</span>,
+                                                     <span class="ident">ptr</span>::<span class="ident">null_mut</span>(),
+                                                     <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">handle</span>,
+                                                     <span class="ident">ptr</span>::<span class="ident">null_mut</span>()) {
+                <span class="ident">winapi</span>::<span class="ident">SEC_E_OK</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">SchannelCred</span>(<span class="ident">handle</span>)),
+                <span class="ident">err</span> <span class="op">=&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">from_raw_os_error</span>(<span class="ident">err</span> <span class="kw">as</span> <span class="ident">i32</span>)),
             }
         }
     }
 }
 
-<span class='doccomment'>/// An SChannel credential.</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>SchannelCred</span>(<span class='ident'>winapi</span>::<span class='ident'>CredHandle</span>);
+<span class="doccomment">/// An SChannel credential.</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SchannelCred</span>(<span class="ident">winapi</span>::<span class="ident">CredHandle</span>);
 
-<span class='kw'>impl</span> <span class='ident'>Drop</span> <span class='kw'>for</span> <span class='ident'>SchannelCred</span> {
-    <span class='kw'>fn</span> <span class='ident'>drop</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) {
-        <span class='kw'>unsafe</span> {
-            <span class='ident'>secur32</span>::<span class='ident'>FreeCredentialsHandle</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>.<span class='number'>0</span>);
+<span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">SchannelCred</span> {
+    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+        <span class="kw">unsafe</span> {
+            <span class="ident">secur32</span>::<span class="ident">FreeCredentialsHandle</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="number">0</span>);
         }
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>Inner</span><span class='op'>&lt;</span><span class='ident'>winapi</span>::<span class='ident'>CredHandle</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>SchannelCred</span> {
-    <span class='kw'>unsafe</span> <span class='kw'>fn</span> <span class='ident'>from_inner</span>(<span class='ident'>inner</span>: <span class='ident'>winapi</span>::<span class='ident'>CredHandle</span>) <span class='op'>-&gt;</span> <span class='ident'>SchannelCred</span> {
-        <span class='ident'>SchannelCred</span>(<span class='ident'>inner</span>)
+<span class="kw">impl</span> <span class="ident">Inner</span><span class="op">&lt;</span><span class="ident">winapi</span>::<span class="ident">CredHandle</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SchannelCred</span> {
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_inner</span>(<span class="ident">inner</span>: <span class="ident">winapi</span>::<span class="ident">CredHandle</span>) <span class="op">-&gt;</span> <span class="ident">SchannelCred</span> {
+        <span class="ident">SchannelCred</span>(<span class="ident">inner</span>)
     }
 
-    <span class='kw'>fn</span> <span class='ident'>as_inner</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>winapi</span>::<span class='ident'>CredHandle</span> {
-        <span class='self'>self</span>.<span class='number'>0</span>
+    <span class="kw">fn</span> <span class="ident">as_inner</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">winapi</span>::<span class="ident">CredHandle</span> {
+        <span class="self">self</span>.<span class="number">0</span>
     }
 
-    <span class='kw'>fn</span> <span class='ident'>get_mut</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>winapi</span>::<span class='ident'>CredHandle</span> {
-        <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>.<span class='number'>0</span>
+    <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">winapi</span>::<span class="ident">CredHandle</span> {
+        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="number">0</span>
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>SchannelCred</span> {
-    <span class='doccomment'>/// Returns a builder.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>builder</span>() <span class='op'>-&gt;</span> <span class='ident'>Builder</span> {
-        <span class='ident'>Builder</span>::<span class='ident'>new</span>()
+<span class="kw">impl</span> <span class="ident">SchannelCred</span> {
+    <span class="doccomment">/// Returns a builder.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">builder</span>() <span class="op">-&gt;</span> <span class="ident">Builder</span> {
+        <span class="ident">Builder</span>::<span class="ident">new</span>()
     }
 }
 </pre>

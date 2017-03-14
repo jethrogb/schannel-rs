@@ -9,6 +9,7 @@
 
     <title>schannel::cert_context::AcquirePrivateKeyOptions - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
     <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../main.css">
     
@@ -43,20 +44,20 @@
     </nav>
 
     <section id='main' class="content struct">
-<h1 class='fqn'><span class='in-band'>Struct <a href='../index.html'>schannel</a>::<wbr><a href='index.html'>cert_context</a>::<wbr><a class='struct' href=''>AcquirePrivateKeyOptions</a></span><span class='out-of-band'><span id='render-detail'>
+<h1 class='fqn'><span class='in-band'>Struct <a href='../index.html'>schannel</a>::<wbr><a href='index.html'>cert_context</a>::<wbr><a class="struct" href=''>AcquirePrivateKeyOptions</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../../src/schannel/cert_context.rs.html#210-213' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../../src/schannel/cert_context.rs.html#247-250' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct AcquirePrivateKeyOptions&lt;'a&gt; { /* fields omitted */ }</pre><div class='docblock'><p>A builder type for certificate private key lookup.</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;'a&gt; <a class='struct' href='../../schannel/cert_context/struct.AcquirePrivateKeyOptions.html' title='schannel::cert_context::AcquirePrivateKeyOptions'>AcquirePrivateKeyOptions</a>&lt;'a&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/schannel/cert_context.rs.html#215-257' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'><h4 id='method.compare_key' class='method'><span id='compare_key.v' class='invisible'><code>fn <a href='#method.compare_key' class='fnname'>compare_key</a>(&amp;mut self,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; compare_key: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&gt; &amp;mut <a class='struct' href='../../schannel/cert_context/struct.AcquirePrivateKeyOptions.html' title='schannel::cert_context::AcquirePrivateKeyOptions'>AcquirePrivateKeyOptions</a>&lt;'a&gt;</code></span></h4>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;'a&gt; <a class="struct" href="../../schannel/cert_context/struct.AcquirePrivateKeyOptions.html" title="struct schannel::cert_context::AcquirePrivateKeyOptions">AcquirePrivateKeyOptions</a>&lt;'a&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/schannel/cert_context.rs.html#252-294' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.compare_key' class="method"><span id='compare_key.v' class='invisible'><code>fn <a href='#method.compare_key' class='fnname'>compare_key</a>(&amp;mut self,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; compare_key: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&gt; &amp;mut <a class="struct" href="../../schannel/cert_context/struct.AcquirePrivateKeyOptions.html" title="struct schannel::cert_context::AcquirePrivateKeyOptions">AcquirePrivateKeyOptions</a>&lt;'a&gt;</code></span></h4>
 <div class='docblock'><p>If set, the certificate&#39;s public key will be compared with the private key to ensure a
 match.</p>
-</div><h4 id='method.silent' class='method'><span id='silent.v' class='invisible'><code>fn <a href='#method.silent' class='fnname'>silent</a>(&amp;mut self, silent: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>) -&gt; &amp;mut <a class='struct' href='../../schannel/cert_context/struct.AcquirePrivateKeyOptions.html' title='schannel::cert_context::AcquirePrivateKeyOptions'>AcquirePrivateKeyOptions</a>&lt;'a&gt;</code></span></h4>
+</div><h4 id='method.silent' class="method"><span id='silent.v' class='invisible'><code>fn <a href='#method.silent' class='fnname'>silent</a>(&amp;mut self, silent: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>) -&gt; &amp;mut <a class="struct" href="../../schannel/cert_context/struct.AcquirePrivateKeyOptions.html" title="struct schannel::cert_context::AcquirePrivateKeyOptions">AcquirePrivateKeyOptions</a>&lt;'a&gt;</code></span></h4>
 <div class='docblock'><p>If set, the lookup will not display any user interface, even if that causes the lookup to
 fail.</p>
-</div><h4 id='method.acquire' class='method'><span id='acquire.v' class='invisible'><code>fn <a href='#method.acquire' class='fnname'>acquire</a>(&amp;self) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/std/io/error/type.Result.html' title='std::io::error::Result'>Result</a>&lt;<a class='struct' href='../../schannel/key_handle/struct.KeyHandle.html' title='schannel::key_handle::KeyHandle'>KeyHandle</a>&gt;</code></span></h4>
+</div><h4 id='method.acquire' class="method"><span id='acquire.v' class='invisible'><code>fn <a href='#method.acquire' class='fnname'>acquire</a>(&amp;self) -&gt; <a class="type" href="https://doc.rust-lang.org/nightly/std/io/error/type.Result.html" title="type std::io::error::Result">Result</a>&lt;<a class="struct" href="../../schannel/key_handle/struct.KeyHandle.html" title="struct schannel::key_handle::KeyHandle">KeyHandle</a>&gt;</code></span></h4>
 <div class='docblock'><p>Acquires the private key handle.</p>
 </div></div></section>
     <section id='search' class="content hidden"></section>

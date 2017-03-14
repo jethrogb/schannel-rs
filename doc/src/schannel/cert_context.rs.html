@@ -9,6 +9,7 @@
 
     <title>cert_context.rs.html -- source</title>
 
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
     <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../main.css">
     
@@ -329,292 +330,392 @@
 <span id="285">285</span>
 <span id="286">286</span>
 <span id="287">287</span>
-</pre><pre class='rust '>
-<span class='doccomment'>//! Bindings to winapi&#39;s `PCCERT_CONTEXT` APIs.</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+</pre><pre class="rust ">
+<span class="doccomment">//! Bindings to winapi&#39;s `PCCERT_CONTEXT` APIs.</span>
 
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>ffi</span>::<span class='ident'>OsString</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>mem</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>os</span>::<span class='ident'>windows</span>::<span class='ident'>prelude</span>::<span class='op'>*</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>ptr</span>;
-<span class='kw'>use</span> <span class='ident'>crypt32</span>;
-<span class='kw'>use</span> <span class='ident'>winapi</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ffi</span>::<span class="ident">OsString</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">mem</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">os</span>::<span class="ident">windows</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ptr</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">slice</span>;
+<span class="kw">use</span> <span class="ident">crypt32</span>;
+<span class="kw">use</span> <span class="ident">winapi</span>;
 
-<span class='kw'>use</span> {<span class='ident'>Inner</span>, <span class='ident'>KeyHandlePriv</span>};
-<span class='kw'>use</span> <span class='ident'>key_handle</span>::<span class='ident'>KeyHandle</span>;
+<span class="kw">use</span> {<span class="ident">Inner</span>, <span class="ident">KeyHandlePriv</span>};
+<span class="kw">use</span> <span class="ident">key_handle</span>::<span class="ident">KeyHandle</span>;
 
-<span class='comment'>// FIXME https://github.com/retep998/winapi-rs/pull/318</span>
-<span class='kw'>const</span> <span class='ident'>CRYPT_ACQUIRE_COMPARE_KEY_FLAG</span>: <span class='ident'>winapi</span>::<span class='ident'>DWORD</span> <span class='op'>=</span> <span class='number'>0x4</span>;
-<span class='kw'>const</span> <span class='ident'>CRYPT_ACQUIRE_SILENT_FLAG</span>: <span class='ident'>winapi</span>::<span class='ident'>DWORD</span> <span class='op'>=</span> <span class='number'>0x40</span>;
-<span class='kw'>const</span> <span class='ident'>CRYPT_ACQUIRE_ALLOW_NCRYPT_KEY_FLAG</span>: <span class='ident'>winapi</span>::<span class='ident'>DWORD</span> <span class='op'>=</span> <span class='number'>0x10000</span>;
+<span class="comment">// FIXME https://github.com/retep998/winapi-rs/pull/318</span>
+<span class="kw">const</span> <span class="ident">CRYPT_ACQUIRE_COMPARE_KEY_FLAG</span>: <span class="ident">winapi</span>::<span class="ident">DWORD</span> <span class="op">=</span> <span class="number">0x4</span>;
+<span class="kw">const</span> <span class="ident">CRYPT_ACQUIRE_SILENT_FLAG</span>: <span class="ident">winapi</span>::<span class="ident">DWORD</span> <span class="op">=</span> <span class="number">0x40</span>;
+<span class="kw">const</span> <span class="ident">CRYPT_ACQUIRE_ALLOW_NCRYPT_KEY_FLAG</span>: <span class="ident">winapi</span>::<span class="ident">DWORD</span> <span class="op">=</span> <span class="number">0x10000</span>;
 
-<span class='doccomment'>/// Wrapper of a winapi certificate, or a `PCCERT_CONTEXT`.</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>CertContext</span>(<span class='ident'>winapi</span>::<span class='ident'>PCCERT_CONTEXT</span>);
+<span class="comment">// FIXME</span>
+<span class="kw">const</span> <span class="ident">CRYPT_STRING_BASE64HEADER</span>: <span class="ident">winapi</span>::<span class="ident">DWORD</span> <span class="op">=</span> <span class="number">0x0</span>;
 
-<span class='kw'>unsafe</span> <span class='kw'>impl</span> <span class='ident'>Sync</span> <span class='kw'>for</span> <span class='ident'>CertContext</span> {}
-<span class='kw'>unsafe</span> <span class='kw'>impl</span> <span class='ident'>Send</span> <span class='kw'>for</span> <span class='ident'>CertContext</span> {}
+<span class="doccomment">/// Wrapper of a winapi certificate, or a `PCCERT_CONTEXT`.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CertContext</span>(<span class="ident">winapi</span>::<span class="ident">PCCERT_CONTEXT</span>);
 
-<span class='kw'>impl</span> <span class='ident'>CertContext</span> {
-    <span class='doccomment'>/// Creates a new certificate from the encoded form.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// For example a DER-encoded certificate can be passed in to create a</span>
-    <span class='doccomment'>/// `CertContext`.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>data</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>]) <span class='op'>-&gt;</span> <span class='ident'>io</span>::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>CertContext</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='ident'>ret</span> <span class='op'>=</span> <span class='kw'>unsafe</span> {
-            <span class='ident'>crypt32</span>::<span class='ident'>CertCreateCertificateContext</span>(
-                <span class='ident'>winapi</span>::<span class='ident'>X509_ASN_ENCODING</span> <span class='op'>|</span>
-                <span class='ident'>winapi</span>::<span class='ident'>PKCS_7_ASN_ENCODING</span>,
-                <span class='ident'>data</span>.<span class='ident'>as_ptr</span>(),
-                <span class='ident'>data</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>winapi</span>::<span class='ident'>DWORD</span>)
+<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">Sync</span> <span class="kw">for</span> <span class="ident">CertContext</span> {}
+<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">CertContext</span> {}
+
+<span class="kw">impl</span> <span class="ident">CertContext</span> {
+    <span class="doccomment">/// Decodes a DER-formatted X509 certificate.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CertContext</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="kw">unsafe</span> {
+            <span class="ident">crypt32</span>::<span class="ident">CertCreateCertificateContext</span>(<span class="ident">winapi</span>::<span class="ident">X509_ASN_ENCODING</span> <span class="op">|</span>
+                                                  <span class="ident">winapi</span>::<span class="ident">PKCS_7_ASN_ENCODING</span>,
+                                                  <span class="ident">data</span>.<span class="ident">as_ptr</span>(),
+                                                  <span class="ident">data</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">winapi</span>::<span class="ident">DWORD</span>)
         };
-        <span class='kw'>if</span> <span class='ident'>ret</span>.<span class='ident'>is_null</span>() {
-            <span class='prelude-val'>Err</span>(<span class='ident'>io</span>::<span class='ident'>Error</span>::<span class='ident'>last_os_error</span>())
-        } <span class='kw'>else</span> {
-            <span class='prelude-val'>Ok</span>(<span class='ident'>CertContext</span>(<span class='ident'>ret</span>))
+        <span class="kw">if</span> <span class="ident">ret</span>.<span class="ident">is_null</span>() {
+            <span class="prelude-val">Err</span>(<span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">last_os_error</span>())
+        } <span class="kw">else</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">CertContext</span>(<span class="ident">ret</span>))
         }
     }
 
-    <span class='doccomment'>/// Returns the sha1 hash of this certificate</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// The sha1 is returned as a 20-byte array representing the bits of the</span>
-    <span class='doccomment'>/// sha1 hash.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>sha1</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>io</span>::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span>[<span class='ident'>u8</span>; <span class='number'>20</span>]<span class='op'>&gt;</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buf</span> <span class='op'>=</span> [<span class='number'>0</span>; <span class='number'>20</span>];
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>len</span> <span class='op'>=</span> <span class='ident'>buf</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>winapi</span>::<span class='ident'>DWORD</span>;
-            <span class='kw'>let</span> <span class='ident'>ret</span> <span class='op'>=</span> <span class='ident'>crypt32</span>::<span class='ident'>CertGetCertificateContextProperty</span>(
-                        <span class='self'>self</span>.<span class='number'>0</span>,
-                        <span class='ident'>winapi</span>::<span class='ident'>CERT_SHA1_HASH_PROP_ID</span>,
-                        <span class='ident'>buf</span>.<span class='ident'>as_mut_ptr</span>() <span class='kw'>as</span> <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>winapi</span>::<span class='ident'>c_void</span>,
-                        <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>len</span>);
-            <span class='kw'>if</span> <span class='ident'>ret</span> <span class='op'>!=</span> <span class='ident'>winapi</span>::<span class='ident'>TRUE</span> {
-                <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>io</span>::<span class='ident'>Error</span>::<span class='ident'>last_os_error</span>())
+    <span class="doccomment">/// Decodes a PEM-formatted X509 certificate.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_pem</span>(<span class="ident">pem</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CertContext</span><span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">pem</span>.<span class="ident">len</span>() <span class="op">&lt;=</span> <span class="ident">winapi</span>::<span class="ident">DWORD</span>::<span class="ident">max_value</span>() <span class="kw">as</span> <span class="ident">usize</span>);
+
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">len</span> <span class="op">=</span> <span class="number">0</span>;
+            <span class="kw">let</span> <span class="ident">ok</span> <span class="op">=</span> <span class="ident">crypt32</span>::<span class="ident">CryptStringToBinaryA</span>(<span class="ident">pem</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">winapi</span>::<span class="ident">LPCSTR</span>,
+                                                   <span class="ident">pem</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">winapi</span>::<span class="ident">DWORD</span>,
+                                                   <span class="ident">CRYPT_STRING_BASE64HEADER</span>,
+                                                   <span class="ident">ptr</span>::<span class="ident">null_mut</span>(),
+                                                   <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">len</span>,
+                                                   <span class="ident">ptr</span>::<span class="ident">null_mut</span>(),
+                                                   <span class="ident">ptr</span>::<span class="ident">null_mut</span>());
+            <span class="kw">if</span> <span class="ident">ok</span> <span class="op">!=</span> <span class="ident">winapi</span>::<span class="ident">TRUE</span> {
+                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">last_os_error</span>());
             }
-            <span class='prelude-val'>Ok</span>(<span class='ident'>buf</span>)
+
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="number">0</span>; <span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>];
+            <span class="kw">let</span> <span class="ident">ok</span> <span class="op">=</span> <span class="ident">crypt32</span>::<span class="ident">CryptStringToBinaryA</span>(<span class="ident">pem</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">winapi</span>::<span class="ident">LPCSTR</span>,
+                                                   <span class="ident">pem</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">winapi</span>::<span class="ident">DWORD</span>,
+                                                   <span class="ident">CRYPT_STRING_BASE64HEADER</span>,
+                                                   <span class="ident">buf</span>.<span class="ident">as_mut_ptr</span>(),
+                                                   <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">len</span>,
+                                                   <span class="ident">ptr</span>::<span class="ident">null_mut</span>(),
+                                                   <span class="ident">ptr</span>::<span class="ident">null_mut</span>());
+            <span class="kw">if</span> <span class="ident">ok</span> <span class="op">!=</span> <span class="ident">winapi</span>::<span class="ident">TRUE</span> {
+                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">last_os_error</span>());
+            }
+
+            <span class="ident">CertContext</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>)
         }
     }
 
-    <span class='doccomment'>/// Returns the `&lt;SIGNATURE&gt;/&lt;HASH&gt;` string representing the certificate</span>
-    <span class='doccomment'>/// signature.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// The `&lt;SIGNATURE&gt;` value identifies the CNG public key</span>
-    <span class='doccomment'>/// algorithm. The `&lt;HASH&gt;` value identifies the CNG hash algorithm.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// Common examples are:</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// * `RSA/SHA1`</span>
-    <span class='doccomment'>/// * `RSA/SHA256`</span>
-    <span class='doccomment'>/// * `ECDSA/SHA256`</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>sign_hash_algorithms</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>io</span>::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span> {
-        <span class='self'>self</span>.<span class='ident'>get_string</span>(<span class='ident'>winapi</span>::<span class='ident'>CERT_SIGN_HASH_CNG_ALG_PROP_ID</span>)
-    }
-
-    <span class='doccomment'>/// Returns the signature hash.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>signature_hash</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>io</span>::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;&gt;</span> {
-        <span class='self'>self</span>.<span class='ident'>get_bytes</span>(<span class='ident'>winapi</span>::<span class='ident'>CERT_SIGNATURE_HASH_PROP_ID</span>)
-    }
-
-    <span class='doccomment'>/// Returns the property displayed by the certificate UI. This property</span>
-    <span class='doccomment'>/// allows the user to describe the certificate&#39;s use.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>description</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>io</span>::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;&gt;</span> {
-        <span class='self'>self</span>.<span class='ident'>get_bytes</span>(<span class='ident'>winapi</span>::<span class='ident'>CERT_DESCRIPTION_PROP_ID</span>)
-    }
-
-    <span class='doccomment'>/// Returns a string that contains the display name for the certificate.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>friendly_name</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>io</span>::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span> {
-        <span class='self'>self</span>.<span class='ident'>get_string</span>(<span class='ident'>winapi</span>::<span class='ident'>CERT_FRIENDLY_NAME_PROP_ID</span>)
-    }
-
-    <span class='doccomment'>/// Configures the string that contains the display name for this</span>
-    <span class='doccomment'>/// certificate.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>set_friendly_name</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>name</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='ident'>io</span>::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
-        <span class='self'>self</span>.<span class='ident'>set_string</span>(<span class='ident'>winapi</span>::<span class='ident'>CERT_FRIENDLY_NAME_PROP_ID</span>, <span class='ident'>name</span>)
-    }
-
-    <span class='doccomment'>/// Verifies the time validity of this certificate relative to the system&#39;s</span>
-    <span class='doccomment'>/// current time.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>is_time_valid</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>io</span>::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>bool</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='ident'>ret</span> <span class='op'>=</span> <span class='kw'>unsafe</span> {
-            <span class='ident'>crypt32</span>::<span class='ident'>CertVerifyTimeValidity</span>(<span class='ident'>ptr</span>::<span class='ident'>null_mut</span>(), (<span class='op'>*</span><span class='self'>self</span>.<span class='number'>0</span>).<span class='ident'>pCertInfo</span>)
-        };
-        <span class='prelude-val'>Ok</span>(<span class='ident'>ret</span> <span class='op'>==</span> <span class='number'>0</span>)
-    }
-
-    <span class='doccomment'>/// Returns a builder used to acquire the private key corresponding to this certificate.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>private_key</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>AcquirePrivateKeyOptions</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-        <span class='ident'>AcquirePrivateKeyOptions</span> {
-            <span class='ident'>cert</span>: <span class='self'>self</span>,
-            <span class='ident'>flags</span>: <span class='number'>0</span>,
+    <span class="doccomment">/// Returns the sha1 hash of this certificate</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The sha1 is returned as a 20-byte array representing the bits of the</span>
+    <span class="doccomment">/// sha1 hash.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sha1</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">20</span>]<span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">20</span>];
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">winapi</span>::<span class="ident">DWORD</span>;
+            <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">crypt32</span>::<span class="ident">CertGetCertificateContextProperty</span>(<span class="self">self</span>.<span class="number">0</span>,
+                                                                 <span class="ident">winapi</span>::<span class="ident">CERT_SHA1_HASH_PROP_ID</span>,
+                                                                 <span class="ident">buf</span>.<span class="ident">as_mut_ptr</span>() <span class="kw">as</span>
+                                                                 <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">winapi</span>::<span class="ident">c_void</span>,
+                                                                 <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">len</span>);
+            <span class="kw">if</span> <span class="ident">ret</span> <span class="op">!=</span> <span class="ident">winapi</span>::<span class="ident">TRUE</span> {
+                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">last_os_error</span>());
+            }
+            <span class="prelude-val">Ok</span>(<span class="ident">buf</span>)
         }
     }
 
-    <span class='doccomment'>/// Deletes this certificate from its certificate store.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>delete</span>(<span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>io</span>::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='kw'>let</span> <span class='ident'>ret</span> <span class='op'>=</span> <span class='ident'>crypt32</span>::<span class='ident'>CertDeleteCertificateFromStore</span>(<span class='self'>self</span>.<span class='number'>0</span>);
-            <span class='ident'>mem</span>::<span class='ident'>forget</span>(<span class='self'>self</span>);
-            <span class='kw'>if</span> <span class='ident'>ret</span> <span class='op'>==</span> <span class='ident'>winapi</span>::<span class='ident'>TRUE</span> {
-                <span class='prelude-val'>Ok</span>(())
-            } <span class='kw'>else</span> {
-                <span class='prelude-val'>Err</span>(<span class='ident'>io</span>::<span class='ident'>Error</span>::<span class='ident'>last_os_error</span>())
+    <span class="doccomment">/// Returns the `&lt;SIGNATURE&gt;/&lt;HASH&gt;` string representing the certificate</span>
+    <span class="doccomment">/// signature.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The `&lt;SIGNATURE&gt;` value identifies the CNG public key</span>
+    <span class="doccomment">/// algorithm. The `&lt;HASH&gt;` value identifies the CNG hash algorithm.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Common examples are:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// * `RSA/SHA1`</span>
+    <span class="doccomment">/// * `RSA/SHA256`</span>
+    <span class="doccomment">/// * `ECDSA/SHA256`</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sign_hash_algorithms</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">get_string</span>(<span class="ident">winapi</span>::<span class="ident">CERT_SIGN_HASH_CNG_ALG_PROP_ID</span>)
+    }
+
+    <span class="doccomment">/// Returns the signature hash.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">signature_hash</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;&gt;</span> {
+        <span class="self">self</span>.<span class="ident">get_bytes</span>(<span class="ident">winapi</span>::<span class="ident">CERT_SIGNATURE_HASH_PROP_ID</span>)
+    }
+
+    <span class="doccomment">/// Returns the property displayed by the certificate UI. This property</span>
+    <span class="doccomment">/// allows the user to describe the certificate&#39;s use.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;&gt;</span> {
+        <span class="self">self</span>.<span class="ident">get_bytes</span>(<span class="ident">winapi</span>::<span class="ident">CERT_DESCRIPTION_PROP_ID</span>)
+    }
+
+    <span class="doccomment">/// Returns a string that contains the display name for the certificate.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">friendly_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">get_string</span>(<span class="ident">winapi</span>::<span class="ident">CERT_FRIENDLY_NAME_PROP_ID</span>)
+    }
+
+    <span class="doccomment">/// Configures the string that contains the display name for this</span>
+    <span class="doccomment">/// certificate.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_friendly_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">set_string</span>(<span class="ident">winapi</span>::<span class="ident">CERT_FRIENDLY_NAME_PROP_ID</span>, <span class="ident">name</span>)
+    }
+
+    <span class="doccomment">/// Verifies the time validity of this certificate relative to the system&#39;s</span>
+    <span class="doccomment">/// current time.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_time_valid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">crypt32</span>::<span class="ident">CertVerifyTimeValidity</span>(<span class="ident">ptr</span>::<span class="ident">null_mut</span>(), (<span class="kw-2">*</span><span class="self">self</span>.<span class="number">0</span>).<span class="ident">pCertInfo</span>) };
+        <span class="prelude-val">Ok</span>(<span class="ident">ret</span> <span class="op">==</span> <span class="number">0</span>)
+    }
+
+    <span class="doccomment">/// Returns a builder used to acquire the private key corresponding to this certificate.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">private_key</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">AcquirePrivateKeyOptions</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+        <span class="ident">AcquirePrivateKeyOptions</span> {
+            <span class="ident">cert</span>: <span class="self">self</span>,
+            <span class="ident">flags</span>: <span class="number">0</span>,
+        }
+    }
+
+    <span class="doccomment">/// Deletes this certificate from its certificate store.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delete</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">crypt32</span>::<span class="ident">CertDeleteCertificateFromStore</span>(<span class="self">self</span>.<span class="number">0</span>);
+            <span class="ident">mem</span>::<span class="ident">forget</span>(<span class="self">self</span>);
+            <span class="kw">if</span> <span class="ident">ret</span> <span class="op">==</span> <span class="ident">winapi</span>::<span class="ident">TRUE</span> {
+                <span class="prelude-val">Ok</span>(())
+            } <span class="kw">else</span> {
+                <span class="prelude-val">Err</span>(<span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">last_os_error</span>())
             }
         }
     }
 
-    <span class='kw'>fn</span> <span class='ident'>get_bytes</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>prop</span>: <span class='ident'>winapi</span>::<span class='ident'>DWORD</span>) <span class='op'>-&gt;</span> <span class='ident'>io</span>::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;&gt;</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>len</span> <span class='op'>=</span> <span class='number'>0</span>;
-            <span class='kw'>let</span> <span class='ident'>ret</span> <span class='op'>=</span> <span class='ident'>crypt32</span>::<span class='ident'>CertGetCertificateContextProperty</span>(
-                        <span class='self'>self</span>.<span class='number'>0</span>,
-                        <span class='ident'>prop</span>,
-                        <span class='ident'>ptr</span>::<span class='ident'>null_mut</span>(),
-                        <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>len</span>);
-            <span class='kw'>if</span> <span class='ident'>ret</span> <span class='op'>!=</span> <span class='ident'>winapi</span>::<span class='ident'>TRUE</span> {
-                <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>io</span>::<span class='ident'>Error</span>::<span class='ident'>last_os_error</span>())
-            }
-
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buf</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>0u8</span>; <span class='ident'>len</span> <span class='kw'>as</span> <span class='ident'>usize</span>];
-            <span class='kw'>let</span> <span class='ident'>ret</span> <span class='op'>=</span> <span class='ident'>crypt32</span>::<span class='ident'>CertGetCertificateContextProperty</span>(
-                        <span class='self'>self</span>.<span class='number'>0</span>,
-                        <span class='ident'>prop</span>,
-                        <span class='ident'>buf</span>.<span class='ident'>as_mut_ptr</span>() <span class='kw'>as</span> <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>winapi</span>::<span class='ident'>c_void</span>,
-                        <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>len</span>);
-            <span class='kw'>if</span> <span class='ident'>ret</span> <span class='op'>!=</span> <span class='ident'>winapi</span>::<span class='ident'>TRUE</span> {
-                <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>io</span>::<span class='ident'>Error</span>::<span class='ident'>last_os_error</span>())
-            }
-            <span class='prelude-val'>Ok</span>(<span class='ident'>buf</span>)
+    <span class="kw">fn</span> <span class="ident">get_encoded_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+        <span class="kw">unsafe</span> {
+            <span class="kw">let</span> <span class="ident">cert_ctx</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="number">0</span>;
+            <span class="ident">slice</span>::<span class="ident">from_raw_parts</span>(<span class="ident">cert_ctx</span>.<span class="ident">pbCertEncoded</span>, <span class="ident">cert_ctx</span>.<span class="ident">cbCertEncoded</span> <span class="kw">as</span> <span class="ident">usize</span>)
         }
     }
 
-    <span class='kw'>fn</span> <span class='ident'>get_string</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>prop</span>: <span class='ident'>winapi</span>::<span class='ident'>DWORD</span>) <span class='op'>-&gt;</span> <span class='ident'>io</span>::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>len</span> <span class='op'>=</span> <span class='number'>0</span>;
-            <span class='kw'>let</span> <span class='ident'>ret</span> <span class='op'>=</span> <span class='ident'>crypt32</span>::<span class='ident'>CertGetCertificateContextProperty</span>(
-                        <span class='self'>self</span>.<span class='number'>0</span>,
-                        <span class='ident'>prop</span>,
-                        <span class='ident'>ptr</span>::<span class='ident'>null_mut</span>(),
-                        <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>len</span>);
-            <span class='kw'>if</span> <span class='ident'>ret</span> <span class='op'>!=</span> <span class='ident'>winapi</span>::<span class='ident'>TRUE</span> {
-                <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>io</span>::<span class='ident'>Error</span>::<span class='ident'>last_os_error</span>())
+    <span class="kw">fn</span> <span class="ident">get_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">prop</span>: <span class="ident">winapi</span>::<span class="ident">DWORD</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">len</span> <span class="op">=</span> <span class="number">0</span>;
+            <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span>
+                <span class="ident">crypt32</span>::<span class="ident">CertGetCertificateContextProperty</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">prop</span>, <span class="ident">ptr</span>::<span class="ident">null_mut</span>(), <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">len</span>);
+            <span class="kw">if</span> <span class="ident">ret</span> <span class="op">!=</span> <span class="ident">winapi</span>::<span class="ident">TRUE</span> {
+                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">last_os_error</span>());
             }
 
-            <span class='comment'>// Divide by 2 b/c `len` is the byte length, but we&#39;re allocating</span>
-            <span class='comment'>// u16 pairs which are 2 bytes each.</span>
-            <span class='kw'>let</span> <span class='ident'>amt</span> <span class='op'>=</span> (<span class='ident'>len</span> <span class='op'>/</span> <span class='number'>2</span>) <span class='kw'>as</span> <span class='ident'>usize</span>;
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buf</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>0u16</span>; <span class='ident'>amt</span>];
-            <span class='kw'>let</span> <span class='ident'>ret</span> <span class='op'>=</span> <span class='ident'>crypt32</span>::<span class='ident'>CertGetCertificateContextProperty</span>(
-                        <span class='self'>self</span>.<span class='number'>0</span>,
-                        <span class='ident'>prop</span>,
-                        <span class='ident'>buf</span>.<span class='ident'>as_mut_ptr</span>() <span class='kw'>as</span> <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>winapi</span>::<span class='ident'>c_void</span>,
-                        <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>len</span>);
-            <span class='kw'>if</span> <span class='ident'>ret</span> <span class='op'>!=</span> <span class='ident'>winapi</span>::<span class='ident'>TRUE</span> {
-                <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>io</span>::<span class='ident'>Error</span>::<span class='ident'>last_os_error</span>())
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="number">0u8</span>; <span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>];
+            <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">crypt32</span>::<span class="ident">CertGetCertificateContextProperty</span>(<span class="self">self</span>.<span class="number">0</span>,
+                                                                 <span class="ident">prop</span>,
+                                                                 <span class="ident">buf</span>.<span class="ident">as_mut_ptr</span>() <span class="kw">as</span>
+                                                                 <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">winapi</span>::<span class="ident">c_void</span>,
+                                                                 <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">len</span>);
+            <span class="kw">if</span> <span class="ident">ret</span> <span class="op">!=</span> <span class="ident">winapi</span>::<span class="ident">TRUE</span> {
+                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">last_os_error</span>());
             }
-
-            <span class='comment'>// Chop off the trailing nul byte</span>
-            <span class='prelude-val'>Ok</span>(<span class='ident'>OsString</span>::<span class='ident'>from_wide</span>(<span class='kw-2'>&amp;</span><span class='ident'>buf</span>[..<span class='ident'>amt</span> <span class='op'>-</span> <span class='number'>1</span>]).<span class='ident'>into_string</span>().<span class='ident'>unwrap</span>())
+            <span class="prelude-val">Ok</span>(<span class="ident">buf</span>)
         }
     }
 
-    <span class='kw'>fn</span> <span class='ident'>set_string</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>prop</span>: <span class='ident'>winapi</span>::<span class='ident'>DWORD</span>, <span class='ident'>s</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='ident'>io</span>::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='kw'>let</span> <span class='ident'>data</span> <span class='op'>=</span> <span class='ident'>s</span>.<span class='ident'>encode_utf16</span>().<span class='ident'>chain</span>(<span class='prelude-val'>Some</span>(<span class='number'>0</span>)).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span>_<span class='op'>&gt;&gt;</span>();
-            <span class='kw'>let</span> <span class='ident'>data</span> <span class='op'>=</span> <span class='ident'>winapi</span>::<span class='ident'>CRYPT_DATA_BLOB</span> {
-                <span class='ident'>cbData</span>: (<span class='ident'>data</span>.<span class='ident'>len</span>() <span class='op'>*</span> <span class='number'>2</span>) <span class='kw'>as</span> <span class='ident'>winapi</span>::<span class='ident'>DWORD</span>,
-                <span class='ident'>pbData</span>: <span class='ident'>data</span>.<span class='ident'>as_ptr</span>() <span class='kw'>as</span> <span class='op'>*</span><span class='kw-2'>mut</span> _,
+    <span class="kw">fn</span> <span class="ident">get_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">prop</span>: <span class="ident">winapi</span>::<span class="ident">DWORD</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">len</span> <span class="op">=</span> <span class="number">0</span>;
+            <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span>
+                <span class="ident">crypt32</span>::<span class="ident">CertGetCertificateContextProperty</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">prop</span>, <span class="ident">ptr</span>::<span class="ident">null_mut</span>(), <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">len</span>);
+            <span class="kw">if</span> <span class="ident">ret</span> <span class="op">!=</span> <span class="ident">winapi</span>::<span class="ident">TRUE</span> {
+                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">last_os_error</span>());
+            }
+
+            <span class="comment">// Divide by 2 b/c `len` is the byte length, but we&#39;re allocating</span>
+            <span class="comment">// u16 pairs which are 2 bytes each.</span>
+            <span class="kw">let</span> <span class="ident">amt</span> <span class="op">=</span> (<span class="ident">len</span> <span class="op">/</span> <span class="number">2</span>) <span class="kw">as</span> <span class="ident">usize</span>;
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="number">0u16</span>; <span class="ident">amt</span>];
+            <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">crypt32</span>::<span class="ident">CertGetCertificateContextProperty</span>(<span class="self">self</span>.<span class="number">0</span>,
+                                                                 <span class="ident">prop</span>,
+                                                                 <span class="ident">buf</span>.<span class="ident">as_mut_ptr</span>() <span class="kw">as</span>
+                                                                 <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">winapi</span>::<span class="ident">c_void</span>,
+                                                                 <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">len</span>);
+            <span class="kw">if</span> <span class="ident">ret</span> <span class="op">!=</span> <span class="ident">winapi</span>::<span class="ident">TRUE</span> {
+                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">last_os_error</span>());
+            }
+
+            <span class="comment">// Chop off the trailing nul byte</span>
+            <span class="prelude-val">Ok</span>(<span class="ident">OsString</span>::<span class="ident">from_wide</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>[..<span class="ident">amt</span> <span class="op">-</span> <span class="number">1</span>]).<span class="ident">into_string</span>().<span class="ident">unwrap</span>())
+        }
+    }
+
+    <span class="kw">fn</span> <span class="ident">set_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">prop</span>: <span class="ident">winapi</span>::<span class="ident">DWORD</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">encode_utf16</span>().<span class="ident">chain</span>(<span class="prelude-val">Some</span>(<span class="number">0</span>)).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>_<span class="op">&gt;&gt;</span>();
+            <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">winapi</span>::<span class="ident">CRYPT_DATA_BLOB</span> {
+                <span class="ident">cbData</span>: (<span class="ident">data</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">2</span>) <span class="kw">as</span> <span class="ident">winapi</span>::<span class="ident">DWORD</span>,
+                <span class="ident">pbData</span>: <span class="ident">data</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> _,
             };
-            <span class='kw'>let</span> <span class='ident'>ret</span> <span class='op'>=</span> <span class='ident'>crypt32</span>::<span class='ident'>CertSetCertificateContextProperty</span>(
-                        <span class='self'>self</span>.<span class='number'>0</span>,
-                        <span class='ident'>prop</span>,
-                        <span class='number'>0</span>,
-                        <span class='kw-2'>&amp;</span><span class='ident'>data</span> <span class='kw'>as</span> <span class='op'>*</span><span class='kw'>const</span> _ <span class='kw'>as</span> <span class='op'>*</span><span class='kw'>const</span> _);
-            <span class='kw'>if</span> <span class='ident'>ret</span> <span class='op'>!=</span> <span class='ident'>winapi</span>::<span class='ident'>TRUE</span> {
-                <span class='prelude-val'>Err</span>(<span class='ident'>io</span>::<span class='ident'>Error</span>::<span class='ident'>last_os_error</span>())
-            } <span class='kw'>else</span> {
-                <span class='prelude-val'>Ok</span>(())
+            <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">crypt32</span>::<span class="ident">CertSetCertificateContextProperty</span>(<span class="self">self</span>.<span class="number">0</span>,
+                                                                 <span class="ident">prop</span>,
+                                                                 <span class="number">0</span>,
+                                                                 <span class="kw-2">&amp;</span><span class="ident">data</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> _ <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> _);
+            <span class="kw">if</span> <span class="ident">ret</span> <span class="op">!=</span> <span class="ident">winapi</span>::<span class="ident">TRUE</span> {
+                <span class="prelude-val">Err</span>(<span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">last_os_error</span>())
+            } <span class="kw">else</span> {
+                <span class="prelude-val">Ok</span>(())
             }
         }
     }
 }
 
-<span class='doccomment'>/// A builder type for certificate private key lookup.</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>AcquirePrivateKeyOptions</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-    <span class='ident'>cert</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>CertContext</span>,
-    <span class='ident'>flags</span>: <span class='ident'>winapi</span>::<span class='ident'>DWORD</span>,
+<span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">CertContext</span> {
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">CertContext</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">get_encoded_bytes</span>() <span class="op">==</span> <span class="ident">other</span>.<span class="ident">get_encoded_bytes</span>()
+    }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='ident'>AcquirePrivateKeyOptions</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-    <span class='doccomment'>/// If set, the certificate&#39;s public key will be compared with the private key to ensure a</span>
-    <span class='doccomment'>/// match.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>compare_key</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>compare_key</span>: <span class='ident'>bool</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>AcquirePrivateKeyOptions</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-        <span class='self'>self</span>.<span class='ident'>flag</span>(<span class='ident'>CRYPT_ACQUIRE_COMPARE_KEY_FLAG</span>, <span class='ident'>compare_key</span>)
+<span class="doccomment">/// A builder type for certificate private key lookup.</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AcquirePrivateKeyOptions</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="ident">cert</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">CertContext</span>,
+    <span class="ident">flags</span>: <span class="ident">winapi</span>::<span class="ident">DWORD</span>,
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">AcquirePrivateKeyOptions</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// If set, the certificate&#39;s public key will be compared with the private key to ensure a</span>
+    <span class="doccomment">/// match.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compare_key</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">compare_key</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AcquirePrivateKeyOptions</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">flag</span>(<span class="ident">CRYPT_ACQUIRE_COMPARE_KEY_FLAG</span>, <span class="ident">compare_key</span>)
     }
 
-    <span class='doccomment'>/// If set, the lookup will not display any user interface, even if that causes the lookup to</span>
-    <span class='doccomment'>/// fail.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>silent</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>silent</span>: <span class='ident'>bool</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>AcquirePrivateKeyOptions</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-        <span class='self'>self</span>.<span class='ident'>flag</span>(<span class='ident'>CRYPT_ACQUIRE_SILENT_FLAG</span>, <span class='ident'>silent</span>)
+    <span class="doccomment">/// If set, the lookup will not display any user interface, even if that causes the lookup to</span>
+    <span class="doccomment">/// fail.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">silent</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">silent</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AcquirePrivateKeyOptions</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">flag</span>(<span class="ident">CRYPT_ACQUIRE_SILENT_FLAG</span>, <span class="ident">silent</span>)
     }
 
-    <span class='kw'>fn</span> <span class='ident'>flag</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>flag</span>: <span class='ident'>winapi</span>::<span class='ident'>DWORD</span>, <span class='ident'>set</span>: <span class='ident'>bool</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>AcquirePrivateKeyOptions</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-        <span class='kw'>if</span> <span class='ident'>set</span> {
-            <span class='self'>self</span>.<span class='ident'>flags</span> <span class='op'>|=</span> <span class='ident'>flag</span>;
-        } <span class='kw'>else</span> {
-            <span class='self'>self</span>.<span class='ident'>flags</span> <span class='op'>&amp;=</span> <span class='op'>!</span><span class='ident'>flag</span>;
+    <span class="kw">fn</span> <span class="ident">flag</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">winapi</span>::<span class="ident">DWORD</span>, <span class="ident">set</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AcquirePrivateKeyOptions</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="ident">set</span> {
+            <span class="self">self</span>.<span class="ident">flags</span> <span class="op">|=</span> <span class="ident">flag</span>;
+        } <span class="kw">else</span> {
+            <span class="self">self</span>.<span class="ident">flags</span> <span class="op">&amp;=</span> <span class="op">!</span><span class="ident">flag</span>;
         }
-        <span class='self'>self</span>
+        <span class="self">self</span>
     }
 
-    <span class='doccomment'>/// Acquires the private key handle.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>acquire</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>io</span>::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>KeyHandle</span><span class='op'>&gt;</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='kw'>let</span> <span class='ident'>flags</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>flags</span> <span class='op'>|</span> <span class='ident'>CRYPT_ACQUIRE_ALLOW_NCRYPT_KEY_FLAG</span>;
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>handle</span> <span class='op'>=</span> <span class='number'>0</span>;
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>spec</span> <span class='op'>=</span> <span class='number'>0</span>;
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>free</span> <span class='op'>=</span> <span class='ident'>winapi</span>::<span class='ident'>FALSE</span>;
-            <span class='kw'>let</span> <span class='ident'>res</span> <span class='op'>=</span> <span class='ident'>crypt32</span>::<span class='ident'>CryptAcquireCertificatePrivateKey</span>(<span class='self'>self</span>.<span class='ident'>cert</span>.<span class='number'>0</span>,
-                                                                 <span class='ident'>flags</span>,
-                                                                 <span class='ident'>ptr</span>::<span class='ident'>null_mut</span>(),
-                                                                 <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>handle</span>,
-                                                                 <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>spec</span>,
-                                                                 <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>free</span>);
-            <span class='kw'>if</span> <span class='ident'>res</span> <span class='op'>!=</span> <span class='ident'>winapi</span>::<span class='ident'>TRUE</span> {
-                <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>io</span>::<span class='ident'>Error</span>::<span class='ident'>last_os_error</span>());
+    <span class="doccomment">/// Acquires the private key handle.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">acquire</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">KeyHandle</span><span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="kw">let</span> <span class="ident">flags</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">flags</span> <span class="op">|</span> <span class="ident">CRYPT_ACQUIRE_ALLOW_NCRYPT_KEY_FLAG</span>;
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">handle</span> <span class="op">=</span> <span class="number">0</span>;
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">spec</span> <span class="op">=</span> <span class="number">0</span>;
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">free</span> <span class="op">=</span> <span class="ident">winapi</span>::<span class="ident">FALSE</span>;
+            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">crypt32</span>::<span class="ident">CryptAcquireCertificatePrivateKey</span>(<span class="self">self</span>.<span class="ident">cert</span>.<span class="number">0</span>,
+                                                                 <span class="ident">flags</span>,
+                                                                 <span class="ident">ptr</span>::<span class="ident">null_mut</span>(),
+                                                                 <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">handle</span>,
+                                                                 <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">spec</span>,
+                                                                 <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">free</span>);
+            <span class="kw">if</span> <span class="ident">res</span> <span class="op">!=</span> <span class="ident">winapi</span>::<span class="ident">TRUE</span> {
+                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">last_os_error</span>());
             }
-            <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>free</span> <span class='op'>==</span> <span class='ident'>winapi</span>::<span class='ident'>TRUE</span>);
-            <span class='prelude-val'>Ok</span>(<span class='ident'>KeyHandle</span>::<span class='ident'>new</span>(<span class='ident'>handle</span>, <span class='ident'>spec</span>))
+            <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">free</span> <span class="op">==</span> <span class="ident">winapi</span>::<span class="ident">TRUE</span>);
+            <span class="prelude-val">Ok</span>(<span class="ident">KeyHandle</span>::<span class="ident">new</span>(<span class="ident">handle</span>, <span class="ident">spec</span>))
         }
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>Clone</span> <span class='kw'>for</span> <span class='ident'>CertContext</span> {
-    <span class='kw'>fn</span> <span class='ident'>clone</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>CertContext</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='ident'>CertContext</span>(<span class='ident'>crypt32</span>::<span class='ident'>CertDuplicateCertificateContext</span>(<span class='self'>self</span>.<span class='number'>0</span>))
+<span class="kw">impl</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">CertContext</span> {
+    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">CertContext</span> {
+        <span class="kw">unsafe</span> { <span class="ident">CertContext</span>(<span class="ident">crypt32</span>::<span class="ident">CertDuplicateCertificateContext</span>(<span class="self">self</span>.<span class="number">0</span>)) }
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">CertContext</span> {
+    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+        <span class="kw">unsafe</span> {
+            <span class="ident">crypt32</span>::<span class="ident">CertFreeCertificateContext</span>(<span class="self">self</span>.<span class="number">0</span>);
         }
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>Drop</span> <span class='kw'>for</span> <span class='ident'>CertContext</span> {
-    <span class='kw'>fn</span> <span class='ident'>drop</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) {
-        <span class='kw'>unsafe</span> {
-            <span class='ident'>crypt32</span>::<span class='ident'>CertFreeCertificateContext</span>(<span class='self'>self</span>.<span class='number'>0</span>);
-        }
+<span class="kw">impl</span> <span class="ident">Inner</span><span class="op">&lt;</span><span class="ident">winapi</span>::<span class="ident">PCCERT_CONTEXT</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CertContext</span> {
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_inner</span>(<span class="ident">t</span>: <span class="ident">winapi</span>::<span class="ident">PCCERT_CONTEXT</span>) <span class="op">-&gt;</span> <span class="ident">CertContext</span> {
+        <span class="ident">CertContext</span>(<span class="ident">t</span>)
+    }
+
+    <span class="kw">fn</span> <span class="ident">as_inner</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">winapi</span>::<span class="ident">PCCERT_CONTEXT</span> {
+        <span class="self">self</span>.<span class="number">0</span>
+    }
+
+    <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">winapi</span>::<span class="ident">PCCERT_CONTEXT</span> {
+        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="number">0</span>
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>Inner</span><span class='op'>&lt;</span><span class='ident'>winapi</span>::<span class='ident'>PCCERT_CONTEXT</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>CertContext</span> {
-    <span class='kw'>unsafe</span> <span class='kw'>fn</span> <span class='ident'>from_inner</span>(<span class='ident'>t</span>: <span class='ident'>winapi</span>::<span class='ident'>PCCERT_CONTEXT</span>) <span class='op'>-&gt;</span> <span class='ident'>CertContext</span> {
-        <span class='ident'>CertContext</span>(<span class='ident'>t</span>)
-    }
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">mod</span> <span class="ident">test</span> {
+    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 
-    <span class='kw'>fn</span> <span class='ident'>as_inner</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>winapi</span>::<span class='ident'>PCCERT_CONTEXT</span> {
-        <span class='self'>self</span>.<span class='number'>0</span>
-    }
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">decode</span>() {
+        <span class="kw">let</span> <span class="ident">der</span> <span class="op">=</span> <span class="macro">include_bytes</span><span class="macro">!</span>(<span class="string">&quot;../test/cert.der&quot;</span>);
+        <span class="kw">let</span> <span class="ident">pem</span> <span class="op">=</span> <span class="macro">include_str</span><span class="macro">!</span>(<span class="string">&quot;../test/cert.pem&quot;</span>);
 
-    <span class='kw'>fn</span> <span class='ident'>get_mut</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>winapi</span>::<span class='ident'>PCCERT_CONTEXT</span> {
-        <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>.<span class='number'>0</span>
+        <span class="kw">let</span> <span class="ident">der</span> <span class="op">=</span> <span class="ident">CertContext</span>::<span class="ident">new</span>(<span class="ident">der</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">pem</span> <span class="op">=</span> <span class="ident">CertContext</span>::<span class="ident">from_pem</span>(<span class="ident">pem</span>).<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">der</span>, <span class="ident">pem</span>);
     }
 }
 </pre>

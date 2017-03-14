@@ -9,6 +9,7 @@
 
     <title>key_handle.rs.html -- source</title>
 
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
     <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../main.css">
     
@@ -80,42 +81,42 @@
 <span id="36">36</span>
 <span id="37">37</span>
 <span id="38">38</span>
-</pre><pre class='rust '>
-<span class='doccomment'>//! Private keys.</span>
+</pre><pre class="rust ">
+<span class="doccomment">//! Private keys.</span>
 
-<span class='kw'>use</span> <span class='ident'>advapi32</span>;
-<span class='kw'>use</span> <span class='ident'>winapi</span>;
+<span class="kw">use</span> <span class="ident">advapi32</span>;
+<span class="kw">use</span> <span class="ident">winapi</span>;
 
-<span class='kw'>use</span> <span class='ident'>KeyHandlePriv</span>;
+<span class="kw">use</span> <span class="ident">KeyHandlePriv</span>;
 
-<span class='doccomment'>/// A handle to a private key.</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>KeyHandle</span> {
-    <span class='ident'>handle</span>: <span class='ident'>winapi</span>::<span class='ident'>HCRYPTPROV_OR_NCRYPT_KEY_HANDLE</span>,
-    <span class='ident'>spec</span>: <span class='ident'>winapi</span>::<span class='ident'>DWORD</span>,
+<span class="doccomment">/// A handle to a private key.</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">KeyHandle</span> {
+    <span class="ident">handle</span>: <span class="ident">winapi</span>::<span class="ident">HCRYPTPROV_OR_NCRYPT_KEY_HANDLE</span>,
+    <span class="ident">spec</span>: <span class="ident">winapi</span>::<span class="ident">DWORD</span>,
 }
 
-<span class='comment'>// FIXME https://github.com/retep998/winapi-rs/pull/319</span>
-<span class='kw'>extern</span> <span class='string'>&quot;system&quot;</span> {
-    <span class='kw'>fn</span> <span class='ident'>NCryptFreeObject</span>(<span class='ident'>handle</span>: <span class='ident'>winapi</span>::<span class='ident'>NCRYPT_HANDLE</span>) <span class='op'>-&gt;</span> <span class='ident'>winapi</span>::<span class='ident'>SECURITY_STATUS</span>;
+<span class="comment">// FIXME https://github.com/retep998/winapi-rs/pull/319</span>
+<span class="kw">extern</span> <span class="string">&quot;system&quot;</span> {
+    <span class="kw">fn</span> <span class="ident">NCryptFreeObject</span>(<span class="ident">handle</span>: <span class="ident">winapi</span>::<span class="ident">NCRYPT_HANDLE</span>) <span class="op">-&gt;</span> <span class="ident">winapi</span>::<span class="ident">SECURITY_STATUS</span>;
 }
 
-<span class='kw'>impl</span> <span class='ident'>Drop</span> <span class='kw'>for</span> <span class='ident'>KeyHandle</span> {
-    <span class='kw'>fn</span> <span class='ident'>drop</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) {
-        <span class='kw'>unsafe</span> {
-            <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>spec</span> <span class='op'>==</span> <span class='ident'>winapi</span>::<span class='ident'>CERT_NCRYPT_KEY_SPEC</span> {
-                <span class='ident'>NCryptFreeObject</span>(<span class='self'>self</span>.<span class='ident'>handle</span>);
-            } <span class='kw'>else</span> {
-                <span class='ident'>advapi32</span>::<span class='ident'>CryptReleaseContext</span>(<span class='self'>self</span>.<span class='ident'>handle</span>, <span class='number'>0</span>);
+<span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">KeyHandle</span> {
+    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+        <span class="kw">unsafe</span> {
+            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">spec</span> <span class="op">==</span> <span class="ident">winapi</span>::<span class="ident">CERT_NCRYPT_KEY_SPEC</span> {
+                <span class="ident">NCryptFreeObject</span>(<span class="self">self</span>.<span class="ident">handle</span>);
+            } <span class="kw">else</span> {
+                <span class="ident">advapi32</span>::<span class="ident">CryptReleaseContext</span>(<span class="self">self</span>.<span class="ident">handle</span>, <span class="number">0</span>);
             }
         }
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>KeyHandlePriv</span> <span class='kw'>for</span> <span class='ident'>KeyHandle</span> {
-    <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>handle</span>: <span class='ident'>winapi</span>::<span class='ident'>HCRYPTPROV_OR_NCRYPT_KEY_HANDLE</span>, <span class='ident'>spec</span>: <span class='ident'>winapi</span>::<span class='ident'>DWORD</span>) <span class='op'>-&gt;</span> <span class='ident'>KeyHandle</span> {
-        <span class='ident'>KeyHandle</span> {
-            <span class='ident'>handle</span>: <span class='ident'>handle</span>,
-            <span class='ident'>spec</span>: <span class='ident'>spec</span>,
+<span class="kw">impl</span> <span class="ident">KeyHandlePriv</span> <span class="kw">for</span> <span class="ident">KeyHandle</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">handle</span>: <span class="ident">winapi</span>::<span class="ident">HCRYPTPROV_OR_NCRYPT_KEY_HANDLE</span>, <span class="ident">spec</span>: <span class="ident">winapi</span>::<span class="ident">DWORD</span>) <span class="op">-&gt;</span> <span class="ident">KeyHandle</span> {
+        <span class="ident">KeyHandle</span> {
+            <span class="ident">handle</span>: <span class="ident">handle</span>,
+            <span class="ident">spec</span>: <span class="ident">spec</span>,
         }
     }
 }
