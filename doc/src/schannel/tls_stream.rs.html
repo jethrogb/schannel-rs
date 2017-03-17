@@ -854,9 +854,6 @@
 <span id="809">809</span>
 <span id="810">810</span>
 <span id="811">811</span>
-<span id="812">812</span>
-<span id="813">813</span>
-<span id="814">814</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! Schannel TLS streams.</span>
 <span class="kw">use</span> <span class="ident">crypt32</span>;
@@ -1372,7 +1369,7 @@
                             <span class="ident">first_rgp_chain</span>.<span class="ident">rgpElement</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">winapi</span>::<span class="ident">CERT_CHAIN_ELEMENT</span>,
                             <span class="ident">first_rgp_chain</span>.<span class="ident">cElement</span> <span class="kw">as</span> <span class="ident">usize</span>);
                         <span class="kw">let</span> <span class="ident">final_element</span> <span class="op">=</span> <span class="ident">elements</span>.<span class="ident">last</span>().<span class="ident">unwrap</span>();
-                        
+
                         <span class="kw">let</span> <span class="ident">root_cert</span> <span class="op">=</span> <span class="ident">CertContext</span>::<span class="ident">from_inner</span>(<span class="ident">final_element</span>.<span class="ident">pCertContext</span>);
                         <span class="comment">// find the first cert that matches this root_cert</span>
                         <span class="kw">let</span> <span class="ident">cert_match</span> <span class="op">=</span> <span class="ident">store</span>.<span class="ident">certs</span>()
@@ -1465,7 +1462,7 @@
         <span class="self">self</span>.<span class="ident">enc_in</span>.<span class="ident">set_position</span>(<span class="ident">count</span> <span class="kw">as</span> <span class="ident">u64</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">decrypt</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">decrypt</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="ident">position</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">enc_in</span>.<span class="ident">position</span>() <span class="kw">as</span> <span class="ident">usize</span>;
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bufs</span> <span class="op">=</span> [<span class="ident">secbuf</span>(<span class="ident">winapi</span>::<span class="ident">SECBUFFER_DATA</span>,
@@ -1495,7 +1492,7 @@
                     };
                     <span class="self">self</span>.<span class="ident">consume_enc_in</span>(<span class="ident">nread</span>);
                     <span class="self">self</span>.<span class="ident">needs_read</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">enc_in</span>.<span class="ident">position</span>() <span class="op">==</span> <span class="number">0</span>) <span class="kw">as</span> <span class="ident">usize</span>;
-                    <span class="prelude-val">Ok</span>(())
+                    <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>)
                 }
                 <span class="ident">winapi</span>::<span class="ident">SEC_E_INCOMPLETE_MESSAGE</span> <span class="op">=&gt;</span> {
                     <span class="self">self</span>.<span class="ident">needs_read</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">bufs</span>[<span class="number">1</span>].<span class="ident">BufferType</span> <span class="op">==</span> <span class="ident">winapi</span>::<span class="ident">SECBUFFER_MISSING</span> {
@@ -1503,11 +1500,9 @@
                     } <span class="kw">else</span> {
                         <span class="number">1</span>
                     };
-                    <span class="prelude-val">Ok</span>(())
+                    <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>)
                 }
-                <span class="ident">winapi</span>::<span class="ident">SEC_I_CONTEXT_EXPIRED</span> <span class="op">=&gt;</span> {
-                    <span class="self">self</span>.<span class="ident">shutdown</span>()
-                }
+                <span class="ident">winapi</span>::<span class="ident">SEC_I_CONTEXT_EXPIRED</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
                 <span class="ident">winapi</span>::<span class="ident">SEC_I_RENEGOTIATE</span> <span class="op">=&gt;</span> {
                     <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State</span>::<span class="ident">Initializing</span> {
                         <span class="ident">needs_flush</span>: <span class="bool-val">false</span>,
@@ -1522,11 +1517,9 @@
                     };
                     <span class="self">self</span>.<span class="ident">consume_enc_in</span>(<span class="ident">nread</span>);
                     <span class="self">self</span>.<span class="ident">needs_read</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">enc_in</span>.<span class="ident">position</span>() <span class="op">==</span> <span class="number">0</span>) <span class="kw">as</span> <span class="ident">usize</span>;
-                    <span class="prelude-val">Ok</span>(())
+                    <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>)
                 }
-                <span class="ident">e</span> <span class="op">=&gt;</span> {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">from_raw_os_error</span>(<span class="ident">e</span> <span class="kw">as</span> <span class="ident">i32</span>))
-                }
+                <span class="ident">e</span> <span class="op">=&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">from_raw_os_error</span>(<span class="ident">e</span> <span class="kw">as</span> <span class="ident">i32</span>)),
             }
         }
     }
@@ -1568,9 +1561,7 @@
                     <span class="self">self</span>.<span class="ident">out_buf</span>.<span class="ident">set_position</span>(<span class="number">0</span>);
                     <span class="prelude-val">Ok</span>(())
                 }
-                <span class="ident">err</span> <span class="op">=&gt;</span> {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">from_raw_os_error</span>(<span class="ident">err</span> <span class="kw">as</span> <span class="ident">i32</span>))
-                }
+                <span class="ident">err</span> <span class="op">=&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">from_raw_os_error</span>(<span class="ident">err</span> <span class="kw">as</span> <span class="ident">i32</span>)),
             }
         }
     }
@@ -1660,7 +1651,10 @@
                 <span class="self">self</span>.<span class="ident">needs_read</span> <span class="op">=</span> <span class="number">0</span>;
             }
 
-            <span class="macro">try</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">decrypt</span>());
+            <span class="kw">let</span> <span class="ident">eof</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">decrypt</span>());
+            <span class="kw">if</span> <span class="ident">eof</span> {
+                <span class="kw">break</span>;
+            }
         }
 
         <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">get_buf</span>())
