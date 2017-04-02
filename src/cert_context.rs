@@ -11,6 +11,8 @@ use winapi;
 
 use {Inner, KeyHandlePriv};
 use key_handle::KeyHandle;
+use ncrypt_key::NcryptKey;
+use crypt_prov::CryptProv;
 
 // FIXME https://github.com/retep998/winapi-rs/pull/318
 const CRYPT_ACQUIRE_COMPARE_KEY_FLAG: winapi::DWORD = 0x4;
@@ -26,6 +28,34 @@ pub struct CertContext(winapi::PCCERT_CONTEXT);
 
 unsafe impl Sync for CertContext {}
 unsafe impl Send for CertContext {}
+
+impl Drop for CertContext {
+    fn drop(&mut self) {
+        unsafe {
+            crypt32::CertFreeCertificateContext(self.0);
+        }
+    }
+}
+
+impl Clone for CertContext {
+    fn clone(&self) -> CertContext {
+        unsafe { CertContext(crypt32::CertDuplicateCertificateContext(self.0)) }
+    }
+}
+
+impl Inner<winapi::PCCERT_CONTEXT> for CertContext {
+    unsafe fn from_inner(t: winapi::PCCERT_CONTEXT) -> CertContext {
+        CertContext(t)
+    }
+
+    fn as_inner(&self) -> winapi::PCCERT_CONTEXT {
+        self.0
+    }
+
+    fn get_mut(&mut self) -> &mut winapi::PCCERT_CONTEXT {
+        &mut self.0
+    }
+}
 
 impl CertContext {
     /// Decodes a DER-formatted X509 certificate.
@@ -272,7 +302,7 @@ impl<'a> AcquirePrivateKeyOptions<'a> {
     }
 
     /// Acquires the private key handle.
-    pub fn acquire(&self) -> io::Result<KeyHandle> {
+    pub fn acquire(&self) -> io::Result<PrivateKey> {
         unsafe {
             let flags = self.flags | CRYPT_ACQUIRE_ALLOW_NCRYPT_KEY_FLAG;
             let mut handle = 0;
@@ -288,37 +318,21 @@ impl<'a> AcquirePrivateKeyOptions<'a> {
                 return Err(io::Error::last_os_error());
             }
             assert!(free == winapi::TRUE);
-            Ok(KeyHandle::new(handle, spec))
+            if spec & winapi::CERT_NCRYPT_KEY_SPEC != 0 {
+                Ok(PrivateKey::NcryptKey(NcryptKey::from_inner(handle)))
+            } else {
+                Ok(PrivateKey::CryptProv(CryptProv::from_inner(handle)))
+            }
         }
     }
 }
 
-impl Clone for CertContext {
-    fn clone(&self) -> CertContext {
-        unsafe { CertContext(crypt32::CertDuplicateCertificateContext(self.0)) }
-    }
-}
-
-impl Drop for CertContext {
-    fn drop(&mut self) {
-        unsafe {
-            crypt32::CertFreeCertificateContext(self.0);
-        }
-    }
-}
-
-impl Inner<winapi::PCCERT_CONTEXT> for CertContext {
-    unsafe fn from_inner(t: winapi::PCCERT_CONTEXT) -> CertContext {
-        CertContext(t)
-    }
-
-    fn as_inner(&self) -> winapi::PCCERT_CONTEXT {
-        self.0
-    }
-
-    fn get_mut(&mut self) -> &mut winapi::PCCERT_CONTEXT {
-        &mut self.0
-    }
+/// The private key associated with a certificate context.
+pub enum PrivateKey {
+    /// A CryptoAPI provider.
+    CryptProv(CryptProv),
+    /// A CNG provider.
+    NcryptKey(NcryptKey),
 }
 
 #[cfg(test)]

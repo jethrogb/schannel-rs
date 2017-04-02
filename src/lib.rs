@@ -17,8 +17,10 @@ use key_handle::KeyHandle;
 
 pub mod cert_context;
 pub mod cert_store;
+pub mod crypt_prov;
 /* pub */ mod ctl_context;
 pub mod key_handle;
+pub mod ncrypt_key;
 pub mod schannel_cred;
 pub mod tls_stream;
 
