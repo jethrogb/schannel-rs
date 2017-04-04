@@ -9,10 +9,9 @@ use std::slice;
 use crypt32;
 use winapi;
 
-use {Inner, KeyHandlePriv};
-use key_handle::KeyHandle;
+use Inner;
 use ncrypt_key::NcryptKey;
-use crypt_prov::CryptProv;
+use crypt_prov::{CryptProv, ProviderType};
 
 // FIXME https://github.com/retep998/winapi-rs/pull/318
 const CRYPT_ACQUIRE_COMPARE_KEY_FLAG: winapi::DWORD = 0x4;
@@ -21,6 +20,15 @@ const CRYPT_ACQUIRE_ALLOW_NCRYPT_KEY_FLAG: winapi::DWORD = 0x10000;
 
 // FIXME
 const CRYPT_STRING_BASE64HEADER: winapi::DWORD = 0x0;
+
+// FIXME
+#[repr(C)]
+struct CERT_KEY_CONTEXT {
+    cbSize: winapi::DWORD,
+    // there is actually a union here but this is the variant we want
+    hCryptProv: winapi::HCRYPTPROV,
+    dwKeySpec: winapi::DWORD,
+}
 
 /// Wrapper of a winapi certificate, or a `PCCERT_CONTEXT`.
 #[derive(Debug)]
@@ -43,19 +51,7 @@ impl Clone for CertContext {
     }
 }
 
-impl Inner<winapi::PCCERT_CONTEXT> for CertContext {
-    unsafe fn from_inner(t: winapi::PCCERT_CONTEXT) -> CertContext {
-        CertContext(t)
-    }
-
-    fn as_inner(&self) -> winapi::PCCERT_CONTEXT {
-        self.0
-    }
-
-    fn get_mut(&mut self) -> &mut winapi::PCCERT_CONTEXT {
-        &mut self.0
-    }
-}
+inner!(CertContext, winapi::PCCERT_CONTEXT);
 
 impl CertContext {
     /// Decodes a DER-formatted X509 certificate.
@@ -183,6 +179,36 @@ impl CertContext {
         unsafe {
             let ret = crypt32::CertDeleteCertificateFromStore(self.0);
             mem::forget(self);
+            if ret == winapi::TRUE {
+                Ok(())
+            } else {
+                Err(io::Error::last_os_error())
+            }
+        }
+    }
+
+    pub fn set_key_prov_info<'a>(&'a self) -> SetKeyProvInfo<'a> {
+        SetKeyProvInfo {
+            cert: self,
+            container: None,
+            provider: None,
+            type_: 0,
+            flags: 0,
+            key_spec: 0,
+        }
+    }
+
+    pub fn set_key_context(&self, context: KeyContext) -> io::Result<()> {
+        unsafe {
+            let handle = context.handle;
+            let spec = context.spec;
+            let ctx = CERT_KEY_CONTEXT {
+                cbSize: mem::size_of::<CERT_KEY_CONTEXT>() as winapi::DWORD,
+                hCryptProv: handle.as_inner(),
+                dwKeySpec: spec.0,
+            };
+            mem::forget(handle);
+            let ret = crypt32::CertSetCertificateContextProperty(self.0, winapi::CERT_KEY_CONTEXT_PROP_ID, 0, &ctx as *const _ as *const _);
             if ret == winapi::TRUE {
                 Ok(())
             } else {
@@ -335,8 +361,116 @@ pub enum PrivateKey {
     NcryptKey(NcryptKey),
 }
 
+pub struct SetKeyProvInfo<'a> {
+    cert: &'a CertContext,
+    container: Option<Vec<u16>>,
+    provider: Option<Vec<u16>>,
+    type_: winapi::DWORD,
+    flags: winapi::DWORD,
+    key_spec: winapi::DWORD,
+}
+
+impl<'a> SetKeyProvInfo<'a> {
+    pub fn container(&mut self, container: &str) -> &mut SetKeyProvInfo<'a> {
+        self.container = Some(container.encode_utf16().chain(Some(0)).collect());
+        self
+    }
+
+    pub fn provider(&mut self, provider: &str) -> &mut SetKeyProvInfo<'a> {
+        self.provider = Some(provider.encode_utf16().chain(Some(0)).collect());
+        self
+    }
+
+    pub fn type_(&mut self, type_: ProviderType) -> &mut SetKeyProvInfo<'a> {
+        self.type_ = type_.as_raw();
+        self
+    }
+
+    pub fn keep_open(&mut self, keep_open: bool) -> &mut SetKeyProvInfo<'a> {
+        self.flag(winapi::CERT_SET_KEY_PROV_HANDLE_PROP_ID, keep_open)
+    }
+
+    pub fn machine_keyset(&mut self, machine_keyset: bool) -> &mut SetKeyProvInfo<'a> {
+        self.flag(winapi::CRYPT_MACHINE_KEYSET, machine_keyset)
+    }
+
+    pub fn silent(&mut self, silent: bool) -> &mut SetKeyProvInfo<'a> {
+        self.flag(winapi::CRYPT_SILENT, silent)
+    }
+
+    fn flag(&mut self, flag: winapi::DWORD, on: bool) -> &mut SetKeyProvInfo<'a> {
+        if on {
+            self.flags |= flag;
+        } else {
+            self.flags &= !flag;
+        }
+        self
+    }
+
+    pub fn key_spec(&mut self, key_spec: KeySpec) -> &mut SetKeyProvInfo<'a> {
+        self.key_spec = key_spec.0;
+        self
+    }
+
+    pub fn set(&mut self) -> io::Result<()> {
+        unsafe {
+            let container = self.container.as_ref().map(|s| s.as_ptr()).unwrap_or(ptr::null());
+            let provider = self.provider.as_ref().map(|s| s.as_ptr()).unwrap_or(ptr::null());
+
+            let info = winapi::CRYPT_KEY_PROV_INFO {
+                pwszContainerName: container as *mut _,
+                pwszProvName: provider as *mut _,
+                dwProvType: self.type_,
+                dwFlags: self.flags,
+                cProvParam: 0,
+                rgProvParam: ptr::null_mut(),
+                dwKeySpec: self.key_spec,
+            };
+
+            let res =
+                crypt32::CertSetCertificateContextProperty(self.cert.0,
+                                                           winapi::CERT_KEY_PROV_INFO_PROP_ID,
+                                                           0,
+                                                           &info as *const _ as *const _);
+            if res == winapi::TRUE {
+                Ok(())
+            } else {
+                Err(io::Error::last_os_error())
+            }
+        }
+    }
+}
+
+#[derive(Copy, Clone)]
+pub struct KeySpec(winapi::DWORD);
+
+impl KeySpec {
+    pub fn key_exchange() -> KeySpec {
+        KeySpec(winapi::AT_KEYEXCHANGE)
+    }
+
+    pub fn signature() -> KeySpec {
+        KeySpec(winapi::AT_SIGNATURE)
+    }
+}
+
+pub struct KeyContext {
+    handle: CryptProv,
+    spec: KeySpec,
+}
+
+impl KeyContext {
+    pub fn crypt_prov(handle: CryptProv, spec: KeySpec) -> KeyContext {
+        KeyContext {
+            handle: handle,
+            spec: spec,
+        }
+    }
+}
+
 #[cfg(test)]
 mod test {
+    use crypt_prov::{AcquireOptions, ProviderType};
     use super::*;
 
     #[test]
@@ -347,5 +481,28 @@ mod test {
         let der = CertContext::new(der).unwrap();
         let pem = CertContext::from_pem(pem).unwrap();
         assert_eq!(der, pem);
+    }
+
+    #[test]
+    fn set_key() {
+        let cert = include_bytes!("../test/cert.der");
+        let cert = CertContext::new(cert).unwrap();
+
+        let mut options = AcquireOptions::new();
+        options.container("schannel-tests")
+            .provider(winapi::MS_STRONG_PROV);
+        let type_ = ProviderType::rsa_full();
+
+        let mut container = match options.acquire(type_) {
+            Ok(container) => container,
+            Err(_) => options.new_keyset(true).acquire(type_).unwrap(),
+        };
+        let key = include_bytes!("../test/key.key");
+        container.import()
+            .import(key)
+            .unwrap();
+
+        let context = KeyContext::crypt_prov(container, KeySpec::signature());
+        cert.set_key_context(context).unwrap();
     }
 }

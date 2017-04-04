@@ -12,7 +12,8 @@ use std::thread;
 use winapi;
 
 use Inner;
-use cert_context::CertContext;
+use crypt_prov::{AcquireOptions, ProviderType};
+use cert_context::{CertContext, KeySpec, KeyContext};
 use cert_store::{CertStore, Memory, CertAdd};
 use schannel_cred::{Direction, Protocol, Algorithm, SchannelCred};
 use tls_stream::{self, HandshakeError};
@@ -487,6 +488,76 @@ fn accept_one_byte_at_a_time() {
                         .unwrap();
     let mut stream = tls_stream::Builder::new()
         .accept(creds, OneByteAtATime { inner: stream })
+        .unwrap();
+    assert_eq!(stream.read(&mut [0; 1024]).unwrap(), 4);
+    stream.write_all(&[1, 2, 3, 4]).unwrap();
+    stream.flush().unwrap();
+    let mut buf = [0; 1];
+    assert_eq!(stream.read(&mut buf).unwrap(), 0);
+
+    t.join().unwrap();
+}
+
+#[test]
+fn split_cert_key() {
+    let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+    let addr = listener.local_addr().unwrap();
+    let t = thread::spawn(move || {
+        let cert = include_bytes!("../test/cert.der");
+        let mut store = Memory::new().unwrap();
+        store.add_encoded_certificate(cert).unwrap();
+        let store = store.into_store();
+
+        let stream = TcpStream::connect(&addr).unwrap();
+        let creds = SchannelCred::builder()
+                                 .acquire(Direction::Outbound).unwrap();
+        let mut stream = tls_stream::Builder::new()
+            .domain("localhost")
+            .cert_store(store)
+            .connect(creds, stream)
+            .unwrap();
+        stream.write_all(&[1, 2, 3, 4]).unwrap();
+        stream.flush().unwrap();
+        assert_eq!(stream.read(&mut [0; 1024]).unwrap(), 4);
+        stream.shutdown().unwrap();
+    });
+
+    let cert = include_bytes!("../test/cert.der");
+    let cert = CertContext::new(cert).unwrap();
+
+    let mut options = AcquireOptions::new();
+    options.container("schannel-tests")
+        .provider(winapi::MS_STRONG_PROV);
+    let type_ = ProviderType::rsa_full();
+
+    let mut container = match options.acquire(type_) {
+        Ok(container) => container,
+        Err(_) => options.new_keyset(true).acquire(type_).unwrap(),
+    };
+    let key = include_bytes!("../test/key.key");
+    container.import()
+        .import(key)
+        .unwrap();
+
+    let context = KeyContext::crypt_prov(container, KeySpec::signature());
+    cert.set_key_context(context).unwrap();
+
+    cert.set_key_prov_info()
+        .container("schannel-tests")
+        .provider(winapi::MS_STRONG_PROV)
+        .type_(ProviderType::rsa_full())
+        .keep_open(true)
+        .key_spec(KeySpec::signature())
+        .set()
+        .unwrap();
+
+    let stream = listener.accept().unwrap().0;
+    let creds = SchannelCred::builder()
+                        .cert(cert)
+                        .acquire(Direction::Inbound)
+                        .unwrap();
+    let mut stream = tls_stream::Builder::new()
+        .accept(creds, stream)
         .unwrap();
     assert_eq!(stream.read(&mut [0; 1024]).unwrap(), 4);
     stream.write_all(&[1, 2, 3, 4]).unwrap();
