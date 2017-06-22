@@ -512,7 +512,7 @@ fn split_cert_key() {
         let creds = SchannelCred::builder()
                                  .acquire(Direction::Outbound).unwrap();
         let mut stream = tls_stream::Builder::new()
-            .domain("localhost")
+            .domain("foobar.com")
             .cert_store(store)
             .connect(creds, stream)
             .unwrap();
@@ -540,14 +540,13 @@ fn split_cert_key() {
         .unwrap();
 
     let context = KeyContext::crypt_prov(container, KeySpec::signature());
-    cert.set_key_context(context).unwrap();
 
     cert.set_key_prov_info()
         .container("schannel-tests")
         .provider(winapi::MS_STRONG_PROV)
         .type_(ProviderType::rsa_full())
         .keep_open(true)
-        .key_spec(KeySpec::signature())
+        .key_spec(KeySpec::key_exchange())
         .set()
         .unwrap();
 
